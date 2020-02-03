@@ -1,96 +1,86 @@
+//#include "linked_list.h"
 #include <bits/stdc++.h> 
+#include <string>
+#include <iostream>
+#include <unistd.h> 
+#include "tree.h" 
 using namespace std; 
-  
-class Node { 
-public: 
-    int data; 
-    Node* next; 
-};
 
-void push(Node** head_ref, int new_data)  
-{  
-    /* 1. allocate node */
-    Node* new_node = new Node();  
-  
-    /* 2. put in the data */
-    new_node->data = new_data;  
-  
-    /* 3. Make next of new node as head */
-    new_node->next = (*head_ref);  
-  
-    /* 4. move the head to point to the new node */
-    (*head_ref) = new_node;  
-} 
+string convert_to_string(char* a, int size);
+void my_get_opt(int argc, char*argv[]);
+int validate_cmd_line(int argc, char* argv[]);
+//Global varaibles
+string file_name;
+Node* head;
 
-void printList(struct Node *node) 
-{ 
-    while (node != NULL) 
-    { 
-        printf(" %d ", node->data); 
-        node = node->next; 
-    } 
-}
+const int MAXCHAR = 1024;
 
-int getCount(struct Node* head) 
-{ 
-	if (head == NULL){
-        	return 0; 
-	}
+int main(int argc, char*argv[]){ 
+    //Node* head;
+	//print(head); 
+    if(validate_cmd_line(argc, argv) == -1){
+    	return -1;
+    }
+    else{
+        my_get_opt(argc, argv);
+    }
 
-	return 1 + getCount(head->next); 
-} 
+    
 
-void deleteNode(struct Node **head_ref, int key) 
-{
-	struct Node* temp = *head_ref, *prev; 
-	if (temp != NULL && temp->data == key) 
-    	{ 
-        	*head_ref = temp->next;
-		free(temp);
-		return;
-	}
-	
-	while (temp != NULL && temp->data != key) 
-    	{ 
-        	prev = temp; 
-        	temp = temp->next; 
-    	} 
+  //  head = new Node(); 
+   // push(&head, 10);  
+   // push(&head, 30);  
+   // push(&head, 11);  
+   // push(&head, 21);  
+   // push(&head, 14); 
 
-	if (temp == NULL) return; 
-
-	prev->next = temp->next; 
-
-	free(temp);
-}
-
-bool search(Node* head, int x)  
-{  
-  Node* current = head;
-  while (current != NULL)  
-  {  
-    if (current->key == x){ 
-            		return true;  
-	}
-    current = current->next;  
-  }  
-    return false;  
-}  
-
-int main() 
-{ 
-    Node* head = NULL; 
-    int x = 21;  
-
-    head = new Node(); 
-    push(&head, 10);  
-    push(&head, 30);  
-    push(&head, 11);  
-    push(&head, 21);  
-    push(&head, 14); 
-
-    printList(head); 
-
-    search(head, 21)? cout<<"Yes" : cout<<"No";  
+    //printList(head); 
 
     return 0;
+}
+
+void my_get_opt(int argc, char* argv[]){
+	int c;
+    while ((c = getopt (argc, argv, "hf:")) != -1){
+        switch (c)
+        {
+            case 'h':
+                printf("To run the program you have following options:\n\n[ -h for help]\nTo execute the file follow the code:\n./%s [ -h ] or any other options", argv[0]);
+                break;
+            case 'f':
+		char dummy[MAXCHAR];
+		strncpy(dummy, optarg, 255);
+		int size = strlen(dummy);
+		file_name = convert_to_string(optarg, size);
+                file_name.append(".sp2020");
+                //cout << file_name << endl;
+                build_tree(file_name);
+                break;
+        }
+    }
+}
+
+string convert_to_string(char* a, int size) 
+{ 
+    int i;
+//	cout << size << " size of string\n"; 
+    string s = ""; 
+    for (i = 0; i < size; i++) { 
+        s = s + a[i]; 
+    } 
+    return s; 
+} 
+
+int validate_cmd_line(int argc, char* argv[]){
+	if(argc > 1){
+		//int pos;
+		//for(pos = 1; pos < argc; pos++){
+		//	cout << argv[pos] << endl;
+		//}
+		return 0;
+	}
+	else{
+		cout << "Argument not received\n";
+		return -1;
+	}
 }
