@@ -12,17 +12,19 @@ using namespace std;
 pointer to left child and a 
 pointer to right child */
 struct Node { 
-    char data[1024];
-	//int dups;
-    Node* left;
-	Node* right; 
+    string data;
+	struct Node* next;
+    struct Node* left;
+	struct Node* right; 
 };
 
 Node* newNode(string data);
-Node* insertLevelOrder(char key[], Node* root);
-void inOrder(Node* root);
-void preOrder(Node* root, int lvl);
-void postOrder(Node* root);
-bool is_number(const std::string& s);
+Node* insert(struct Node* root, string data);
+void inOrder(struct Node* root);
+void preOrder(struct Node* root);
+void postOrder(struct Node* root);
+void addToSameNode(string item, struct Node** node);
+void print_same_node(struct Node* root);
+//bool is_number(const std::string& s);
 
 #endif	//BUILD_TREE_H
