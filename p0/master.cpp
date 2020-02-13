@@ -1,10 +1,7 @@
-//#include "linked_list.h"
 #include <bits/stdc++.h> 
 #include <string>
-//#include <iostream>
 #include <unistd.h>
 #include <fstream>
-//#include <sstream>
 #include <cstdlib>
 #include <stdlib.h>
 #include <vector>
@@ -16,9 +13,9 @@ void my_get_opt(int argc, char*argv[]);
 int validate_cmd_line(int argc, char* argv[]);
 vector<string> read_file(string file_name);
 vector<string> read_user_input();
+void is_file_empty(vector<string> file_content);
 //Global varaibles
 string file_name;
-//Node* head;
 bool is_file_given = false;
 
 const int MAXCHAR = 1024;
@@ -57,14 +54,6 @@ int main(int argc, char*argv[]){
 		}
     }
 
-//	if(is_file_given){
-//		temp = read_file(file_name);
-//		root = insert(root, temp[0]);
-//		int i;
-//		for (i = 1; (unsigned)i < temp.size(); ++i){
-//			insert(root, temp[i]);
-//		}
-//	}
 
 	ofstream file;
 	file.open("output.inorder");
@@ -91,25 +80,35 @@ int main(int argc, char*argv[]){
     return 0;
 }
 
+void is_file_empty(vector<string> file_content){
+	if(file_content.size() == 0){
+		cout<<"[ERROR] Content is empty, exiting program\n";
+		exit(1);
+	}
+}
+
 vector<string> read_user_input(){
 	vector<string> user_input;
 	cout<<"Please input data in a single line seperated by space(George, geo, hello)\n";
 	string line;
 	if(!getline(cin, line)){
-		cout<<"Erro accured while reading\n";
+		cout<<"[ERROR] can not read input\n";
 		exit(1);
 	}
+	line+=" ";
 	string build_word = "";
 	for(auto word : line){
 		if(word == ' '){
-			//cout<<build_word<<endl;
-			user_input.push_back(build_word);
+			if(build_word != ""){
+				user_input.push_back(build_word);
+			}
 			build_word = "";
 		}
 		else{
 			build_word += word;
 		}
 	}
+	is_file_empty(user_input);
 	return user_input;
 }
 
@@ -128,20 +127,14 @@ void my_get_opt(int argc, char* argv[]){
 				size = strlen(dummy);
 				file_name = convert_to_string(optarg, size);
                 file_name.append(".sp2020");
-                //cout << file_name << endl;
-               // read_file(file_name);
 				is_file_given = true;
                 break;
-			default:
-				//cout<<"Uknown option is given, termination started!\n";
-				break;
         }
     }
 }
 
 string convert_to_string(char* a, int size){ 
     int i;
-//	cout << size << " size of string\n"; 
     string s = ""; 
     for (i = 0; i < size; i++) { 
         s = s + a[i]; 
@@ -154,7 +147,7 @@ int validate_cmd_line(int argc, char* argv[]){
 		return 0;
 	}
 	else{
-		cout<<"No input file is given launching user input!\n";
+		cout<<"[REDIRECT] No input file is given launching user input!\n";
 		return -1;
 	}
 }
@@ -165,7 +158,7 @@ vector<string> read_file(string file_name){
 	file.open(file_name);
 
 	if(!file) {
-        cout << "Unable to open file\n";
+        cout << "[ERROR] Unable to open file\n";
         exit(1); // terminate with error
     }
     string val;
@@ -174,10 +167,11 @@ vector<string> read_file(string file_name){
 		size_t start = val.find_first_not_of(WHITESPACE);
 		size_t end = val.find_last_not_of(WHITESPACE);
 		string trimmed_val = val.substr(start, end+1);
-		//cout<<trimmed_val<<endl;
 		file_vals.push_back(trimmed_val);
     }
-    
+
+	is_file_empty(file_vals);
+
     file.close();
 	return file_vals;
 }
