@@ -13,17 +13,19 @@ MATH = -lm
 
 HEADER_FILE = helper.h
 
+CPP_11 = -std=c++11
+
 SRC =
 SHARE_OBJ = linked_list.o tree.o build_tree.o
 SHARE_HEAD = linked_list.h tree.h build_tree.h
 
 %.o: %.cpp $(SHARE_HEAD)
-	$(CC) -std=c++11 -c -o $@ $< $(CFLAGS)
+	$(CC) $(CPP_11) -c -o $@ $< $(CFLAGS)
 
 all: $(MASTER_EXE)
 
 $(MASTER_EXE): $(MASTER_OBJ) $(SHARE_OBJ)
-	$(CC) -std=c++11 -o $(MASTER_EXE) $^ $(CFLAGS)
+	$(CC) $(CPP_11) -o $(MASTER_EXE) $^ $(CFLAGS)
 
 clean:
 	rm $(MASTER_EXE) $(MASTER_OBJ) $(SHARE_OBJ)
