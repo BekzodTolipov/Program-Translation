@@ -3,7 +3,8 @@
 #include<stdio.h> 
 #include<stdlib.h>
 
-struct Node *newNode(string item){ 
+// Create a new node
+struct Node *new_node(string item){ 
 	struct Node *temp = new Node(); 
     temp->data = item;
 	temp->next = NULL; 
@@ -11,14 +12,15 @@ struct Node *newNode(string item){
 	return temp; 
 }
 
-void addToSameNode(string item, struct Node** node){
+// Add to same node
+void add_to_same_node(string item, struct Node** node){
 	struct Node *last = *node;
-	struct Node* new_node = newNode(item);
+	struct Node* new_node_created = new_node(item);
 	
 	while(last->next != NULL){
 		last = last->next;
 	}
-	last->next = new_node;
+	last->next = new_node_created;
 } 
    
    
@@ -26,12 +28,12 @@ void addToSameNode(string item, struct Node** node){
 struct Node* insert(struct Node* node, string key){ 
 	/* If the tree is empty, return a new node */
     if (node == NULL){
-		return newNode(key); 
+		return new_node(key); 
 	}
   
     /* Otherwise, recur down the tree */
 	if(key.substr(0, 2) == (node->data).substr(0,2)){
-    	addToSameNode(key, &node);
+    	add_to_same_node(key, &node);
 	}
     else if (key < node->data){
         node->left  = insert(node->left, key); 
@@ -46,43 +48,37 @@ struct Node* insert(struct Node* node, string key){
 
 // Function to print tree nodes in 
 // InOrder fashion 
-void inOrder(Node* root, int space, std::ofstream &file){ 
+void in_order(Node* root, int space, std::ofstream &file){ 
     if (root == NULL){
 		return;
 	} 
-    inOrder(root->left, space+2, file);
-	//file.open(file_name_in);
+    in_order(root->left, space+2, file);
 	if(space > 2){
 		print_spaces(space, file);
 	}
-	//cout<<space;
-	//file.open(file_name_in);
 	cout << root->data;
 	file << root->data;
-	//file.close();
 	print_same_node(root->next, file);
-	//file.close();
-	//cout<<endl;
-    inOrder(root->right, space+2, file);
-	//file.close(); 
+    in_order(root->right, space+2, file);
 } 
 
-void postOrder(Node* root, int space, std::ofstream &file){
+// Print tree post order
+void post_order(Node* root, int space, std::ofstream &file){
 	if(root == NULL){
 		return;
 	}
-	postOrder(root->left, space+2, file);
-    postOrder(root->right, space+2, file);
+	post_order(root->left, space+2, file);
+    post_order(root->right, space+2, file);
 	if(space > 2){
 		print_spaces(space, file);
 	}
     cout << root->data;
 	file << root->data;
 	print_same_node(root->next, file);
-	//cout<<endl;
 }
 
-void preOrder(Node* root, int space, std::ofstream &file){
+// Print tree pre order
+void pre_order(Node* root, int space, std::ofstream &file){
 	
 	if(root == NULL){
 		return;
@@ -90,17 +86,15 @@ void preOrder(Node* root, int space, std::ofstream &file){
 	if(space > 2){
 		print_spaces(space, file);
 	}
-	//cout<<space;
     cout << root->data;
 	file << root->data;
 	print_same_node(root->next, file);
-	//cout<<endl;
-    preOrder(root->left, space+2, file);
-    preOrder(root->right, space+2, file);
+    pre_order(root->left, space+2, file);
+    pre_order(root->right, space+2, file);
 }
 
+// Print same node
 void print_same_node(struct Node* root, std::ofstream &file){
-	//file.open(file_name);
 	while(root != NULL){
 		cout<<":"<<(root->data);
 		file<<":"<<(root->data);
@@ -108,14 +102,12 @@ void print_same_node(struct Node* root, std::ofstream &file){
 	}
 	cout<<endl;
 	file<<endl;
-//	file.close();
 }
 
+// Indentation with dashes
 void print_spaces(int space, std::ofstream &file){
-	//file.open(file_name);
 	for(int i = 0; i < space; i++){
-		cout<<" ";
-		file<<" ";
+		cout<<"-";
+		file<<"-";
 	}
-//	file.close();
 }
