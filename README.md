@@ -7,14 +7,14 @@
    
 ## Program Description
 This is simple project to practice on how tree is build and see 
-***In-order:
+### In-order:
     process left child
     process root
     process right child
-***Pre-order:
+### Pre-order:
     process root
     process children left to right
-***Post-order traversals:
+### Post-order traversals:
       process left and right child
       process root
     
