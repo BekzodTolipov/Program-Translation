@@ -33,7 +33,8 @@ struct Node* insert(struct Node* node, string key){
   
     /* Otherwise, recur down the tree */
 	if(key.substr(0, 2) == (node->data).substr(0,2)){
-    	add_to_same_node(key, &node);
+		if(key != node->data)
+    		add_to_same_node(key, &node);
 	}
     else if (key < node->data){
         node->left  = insert(node->left, key); 
