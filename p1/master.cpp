@@ -21,6 +21,9 @@ string file_name;
 bool is_file_given = false;
 const int MAXCHAR = 1024;
 
+// Scanner
+Scanner newScanner;
+
 int main(int argc, char*argv[]){ 
 	vector<string> temp;
 	cout<<"\nWelcome to simple Scanner to tokenize the given file\n";
@@ -131,7 +134,7 @@ int validate_cmd_line(int argc, char* argv[]){
 
 // Read the file given
 vector<string> read_file(string file_name){
-	Scanner newScanner;
+	//Scanner newScanner;
 	vector<string> file_vals;
 	ifstream file;
 	file.open(file_name);	// Open given file
@@ -153,13 +156,14 @@ vector<string> read_file(string file_name){
 			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
 			string trimmed_word = word.substr(start, end+1);
 			file_vals.push_back(trimmed_word);
-			cout<<trimmed_word<<endl;
+			//cout<<trimmed_word<<endl;
 			newScanner.setNewWord(trimmed_word, line_count+1, space_to_word);
 			space_to_word += word.size();
 	//	line++;
     	}
 		line_count++;
 	}
+	newScanner.setNewWord("EOF", line_count+1, 0);
 
 	is_file_empty(file_vals);	// Check if file is empty
 

@@ -22,6 +22,7 @@ class Scanner {
 		vector<tokenInfo> idToken;
 		vector<tokenInfo> intToken;
 		vector<tokenInfo> resToken;
+		vector<tokenInfo> EOFToken;
 
 		vector<string> reservedWords = {"label", "goto", "loop", "void", "declare", "return", "in", "out", "program", "iffy", "then", "assign", "data"};
 	public:
