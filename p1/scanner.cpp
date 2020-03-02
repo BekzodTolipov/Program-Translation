@@ -27,51 +27,59 @@ char Scanner::getLetter(unsigned int pos){
 	//	cout<<val<<" null value\n";
 		return '\0';
 	}
-	
+	//cout<<"\n\n letter we checking: "<< wordToCheck[pos]<<"\n\n";
 	return wordToCheck[pos];
 //	int value = (int) val;
 //	return value;
 }
 
-void Scanner::addToStruct(){
-	temp.token = wordToCheck;
+void Scanner::addToStruct(int pos){
+	temp.tokenType = tokenType[pos];
+	temp.token = acceptingToken;
 	temp.line = lineCount;
 	temp.charToWord = wordCount;
 }
 
-void Scanner::printTokens(string tokenType){
-	cout<<"<"<<tokenType<<", "<<wordToCheck<<", "<<lineCount<<", "<<wordCount<<">\n";
+void Scanner::printTokens(){
+	cout<<"<"<<temp.tokenType<<", "<<temp.token<<", "<<temp.line<<", "<<temp.charToWord<<">\n";
 }
 
 void Scanner::findTokenType(int state){
-
+	int check = state-1001;
 	//struct tokenInfo temp = NULL;
-	switch(state-1001){
-		case 0:	// For identifiers and reserved words
-			if(find(reservedWords.begin(), reservedWords.end(), wordToCheck) != reservedWords.end()){
-				printTokens("resToken");
-				addToStruct();	
-                resToken.push_back(temp);
+//	switch(check){
+//		case 0:	// For identifiers and reserved words
+			if(find(reservedWords.begin(), reservedWords.end(), acceptingToken) != reservedWords.end()){
+				//printTokens("resToken");
+				addToStruct(22);// resWord	
+				printTokens();
+                tokens.push_back(temp);
             }
             else{
 				//cout<<"<idToken, "<<wordToCheck<<">\n";
-				printTokens("idToken");
-				addToStruct();
-                idToken.push_back(temp);
+				//printTokens("idToken");
+				addToStruct(check);
+                printTokens();
+				tokens.push_back(temp);
             }
-			break;
-		case 1:	// For integers
+//			break;
+//		case 1:	// For integers
 			//cout<<"<intToken, "<<wordToCheck<<">\n";
-			printTokens("intToken");
-			addToStruct();
-			intToken.push_back(temp);
-			break;
-		case 1000:	// End of file token
-			printTokens("EOFToken");
-			addToStruct();
-			EOFToken.push_back(temp);
-			break;
-	}
+			//printTokens("intToken");
+//			addToStruct(check);
+//			printTokens();
+//			tokens.push_back(temp);
+//			break;
+//		case 2:
+//			addToStruct();
+//			printTokens()
+//		case 21:	// End of file token
+			//printTokens("EOFToken");
+//			addToStruct(check);
+//			printTokens
+//			tokens.push_back(temp);
+//			break;
+//	}
 
 }
 
@@ -84,13 +92,14 @@ void Scanner::findError(int state){
 
 void Scanner::driverFA(){
 	if(wordToCheck == "EOF"){
-		findTokenType(2001);
+		acceptingToken = "EOF";
+		findTokenType(1022);
 		return;
 	}
 	int state = 1;
 	int nextState;
 	char nextChar;
-	int position = 0;
+	unsigned int position = 0;
 	string potenToken = "";
 //	for(char letter : wordToCheck){
 		while(state < FINAL){
@@ -104,8 +113,29 @@ void Scanner::driverFA(){
 				return;
 			}
 			if(nextState > FINAL){
-				findTokenType(nextState);
-				return;	
+				if((state != 8) and ((potenToken == ":" and nextChar == '=') or (potenToken == "=" and nextChar == '='))){
+					state = 8;
+					continue;
+				}
+				else if((state == 8) and ((potenToken == ":" and nextChar == '=') or (potenToken == "=" and nextChar == '='))){
+					position++;
+				}
+				
+				if(position < wordToCheck.size()){
+					acceptingToken = wordToCheck.substr(0, position);
+					findTokenType(nextState);
+					wordToCheck = wordToCheck.substr(position, (wordToCheck.size()-position));
+						//cout<<"\n\n"<<wordToCheck<<" new substring we have\n\n";
+					state = 1;
+					position = -1;
+					potenToken = "";
+				}
+				else{
+					//cout<<"\n\nposition not less anymore\n\n";
+					acceptingToken = wordToCheck;
+					findTokenType(nextState);
+					return;
+				}	
 			}
 			else{
 				state = nextState;
@@ -153,16 +183,19 @@ void Scanner::setupFSAtable() {
 		1019: ; Operator
 		1020: [ Operator
 		1021: ] Operator
+
+		1022: EOFToken
+		1023: resWordToken
 	*/
 	int i;
 	vector<int> header;
 	vector<int> state_1;	// For White Space
 	vector<int> state_2;	// For Identifiers
 	vector<int> state_3;	// For Integers
-	vector<int> state_4;	// For Colon
-	vector<int> state_5;	// For Colon Equal
-	vector<int> state_6;	// For Less Than
-	vector<int> state_7;	// For Greater Than
+	vector<int> state_4;	// For : Colon
+	vector<int> state_5;	// For := Colon Equal
+	vector<int> state_6;	// For < Less Than
+	vector<int> state_7;	// For > Greater Than
 	vector<int> state_8;	// For ==
 	vector<int> state_9;	// For +
 	vector<int> state_10;	// For -
@@ -473,7 +506,7 @@ void Scanner::setupFSAtable() {
 		}
 		else if(i == 60){	// Less than
 			state_2.push_back(1001);
-			state_1.push_back(-1);
+			state_1.push_back(6);
 			state_3.push_back(1002);
 			state_4.push_back(1003);
 			state_5.push_back(1004);
@@ -521,13 +554,13 @@ void Scanner::setupFSAtable() {
 		}
 		else if(i == 62){	// Greater than
 			state_2.push_back(1001);
-			state_1.push_back(-1);
+			state_1.push_back(7);
 			state_3.push_back(1002);
 			state_4.push_back(1003);
 			state_5.push_back(1004);
 			state_6.push_back(1005);
 			state_7.push_back(1006);
-			state_8.push_back(-3);
+			state_8.push_back(8);
 			state_9.push_back(1008);
 			state_10.push_back(1009);
 			state_11.push_back(1010);
