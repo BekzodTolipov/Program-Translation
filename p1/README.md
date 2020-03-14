@@ -1,7 +1,7 @@
 # Scanner
 
 This project is build to demonstrate how SCANNER tokenize words it received.
-It has 4 main categories:
+It has 5 main categories:
 * Launcher
 	* Will start the program by reading given argument by user, which can be a file or commend line input
 * FSA table generator
