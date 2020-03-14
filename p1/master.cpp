@@ -67,7 +67,7 @@ void is_file_empty(vector<string> file_content){
 // If no file is given then read from command line
 vector<string> read_user_input(){
 	vector<string> user_input;
-	cout<<"Please input data in a single line seperated by space(George, geo, hello)\n";
+	cout<<"Please input data in a single line(x:=z go245)\n";
 	string line;
 	if(!getline(cin, line)){
 		cout<<"[ERROR] can not read input\n";
@@ -146,9 +146,9 @@ vector<string> read_file(string file_name){
 	}
 	string line;
 	string word;
+	string result;
 	string WHITESPACE = "\n\r\t\f\v";
 	int line_count = 0;
-	bool isCommentFound = false;
 	string filtered_word = "";
 	while(getline(file, line)){
 		int space_to_word = 0;
@@ -159,7 +159,10 @@ vector<string> read_file(string file_name){
 			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
 			string trimmed_word = word.substr(start, end+1);
 			file_vals.push_back(trimmed_word);
-			newScanner.setNewWord(trimmed_word, line_count+1, space_to_word);
+			result = newScanner.setNewWord(trimmed_word, line_count+1, space_to_word);
+			if(result.find("SCANNER ERROR:") != std::string::npos){
+				exit(-1);
+			}
 			space_to_word += word.size();
 		}
 		line_count++;
@@ -171,14 +174,16 @@ vector<string> read_file(string file_name){
 	file.close();
 	return file_vals;
 }
-
+// Will receive a line from file 
+// and check if it contains comment
+// and filters them out
 string filterElement(string line){
 	int pos = 0;
 	int prev_pos = 0;
 	string new_line = "";
 	stringstream iss(line);
 	string word = "";
-	bool found = false;
+	static bool found = false;
 	while(iss >> word){
 		for(char letter : word){
 			if(letter == '#'){

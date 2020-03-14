@@ -1,12 +1,14 @@
 #include <bits/stdc++.h> 
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 #ifndef SCANNER_H
 #define SCANNER_H
 
 class Scanner {
+	// Structure to keep track internally
 	struct tokenInfo{
 		string tokenType;
 		int line;
@@ -14,15 +16,15 @@ class Scanner {
 		string token;
 	};
 	private:
-	string wordToCheck;
-	string acceptingToken;
-	int lineCount;
-	int wordCount;
-	struct tokenInfo temp;
+	string wordToCheck;	// Checking in progress word
+	string acceptingToken;	// Finished checking now will accept that word
+	int lineCount;	// Which line word was read
+	int wordCount;	// Which column it was found
+	struct tokenInfo temp;	// Temp storage for token
 	vector<vector<int>> fsaTable;
 
-	vector<tokenInfo> tokens;
-
+	vector<tokenInfo> tokens;	// All tokens which was read during execution
+	// All accepting token types
 	vector<string> tokenType = {"idToken",
 		"intToken",
 		"colonToken",
@@ -47,6 +49,7 @@ class Scanner {
 		"EOFToken",
 		"resWordToken"
 	};
+	// All accepting reserved words
 	vector<string> reservedWords = {"label", 
 		"goto", 
 		"loop", 
@@ -62,16 +65,17 @@ class Scanner {
 		"data"
 	};
 	public:
+	// Prototypes
 	Scanner();
 	void printTheWord();
-	void setNewWord(string newWord, int lineCount, int wordCount);
+	string setNewWord(string newWord, int lineCount, int wordCount);
 	void setupFSAtable();
-	void driverFA();
+	string driverFA();
 	char getLetter(unsigned int);
-	void findTokenType(int);
-	void findError(int);
+	string findTokenType(int);
+	string findError(int);
 	void addToStruct(int);
-	void printTokens();
+	string printTokens();
 };
 
 #endif

@@ -6,112 +6,92 @@ int asciiMax = 128;
 const int FINAL = 1000;
 const int ERROR = 0;
 
+// Constructor to start building table
 Scanner::Scanner() {
 	setupFSAtable();
 }
-
+// Debug
 void Scanner::printTheWord() {
 	cout<<wordToCheck<<endl;
 }
-
-void Scanner::setNewWord(string newWord, int line, int word) {
+// Start the scanner by adding the values into its struct and run 
+// driverFA() and return its result
+string Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
-	driverFA();
+	return driverFA();
 }
-
+// Extract letter from word
 char Scanner::getLetter(unsigned int pos){
 	if(pos >= wordToCheck.size()){
-		//	int val = '\0';
-		//	cout<<val<<" null value\n";
 		return '\0';
 	}
-	//cout<<"\n\n letter we checking: "<< wordToCheck[pos]<<"\n\n";
 	return wordToCheck[pos];
-	//	int value = (int) val;
-	//	return value;
 }
-
+// Keeping it inside struct native to Scanner
 void Scanner::addToStruct(int pos){
 	temp.tokenType = tokenType[pos];
 	temp.token = acceptingToken;
 	temp.line = lineCount;
 	temp.charToWord = wordCount;
 }
-
-void Scanner::printTokens(){
-	cout<<"<"<<temp.tokenType<<", "<<temp.token<<", "<<temp.line<<", "<<temp.charToWord<<">\n";
+// Success tokens to print
+string Scanner::printTokens(){
+	ostringstream msg_oss;
+	msg_oss << "<" << temp.tokenType << ", " << temp.token << ", " << temp.line << ", " << temp.charToWord << ">";
+	string msg = msg_oss.str();
+	cout<<msg<<endl;
+	return msg;
 }
-
-void Scanner::findTokenType(int state){
+// Identify token type, such as identifier, reserved or operator
+string Scanner::findTokenType(int state){
 	int check = state-1001;
-	//struct tokenInfo temp = NULL;
-	//	switch(check){
-	//		case 0:	// For identifiers and reserved words
+	string result = "";
 	if(find(reservedWords.begin(), reservedWords.end(), acceptingToken) != reservedWords.end()){
-		//printTokens("resToken");
 		addToStruct(22);// resWord	
-		printTokens();
+		result = printTokens();
 		tokens.push_back(temp);
+		return result;
 	}
 	else{
-		//cout<<"<idToken, "<<wordToCheck<<">\n";
-		//printTokens("idToken");
 		addToStruct(check);
-		printTokens();
+		result = printTokens();
 		tokens.push_back(temp);
+		return result;
 	}
-	//			break;
-	//		case 1:	// For integers
-	//cout<<"<intToken, "<<wordToCheck<<">\n";
-	//printTokens("intToken");
-	//			addToStruct(check);
-	//			printTokens();
-	//			tokens.push_back(temp);
-	//			break;
-	//		case 2:
-	//			addToStruct();
-	//			printTokens()
-	//		case 21:	// End of file token
-	//printTokens("EOFToken");
-	//			addToStruct(check);
-	//			printTokens
-	//			tokens.push_back(temp);
-	//			break;
-	//	}
-
 }
-
-void Scanner::findError(int state){
+// Fail token error to print
+string Scanner::findError(int state){
 	int val = (state * -1) - 1;
 	vector<string> errors = {"Unknown symbol was found", "Unknown symbol was found in identifier", "can NOT be used by itself (valid symbols{:= or ==})"};
-
-	cout<<"SCANNER ERROR: "<<"'"<<wordToCheck<<"' "<<errors[val]<<" on line: "<<lineCount<<", "<<wordCount<<endl;
+	ostringstream msg_oss;
+	msg_oss << "SCANNER ERROR: '" << wordToCheck << "' " << errors[val] << " on line: " << lineCount << ", " << wordCount;
+	string msg = msg_oss.str();
+	cout<<msg<<endl;
+	return msg;
 }
-
-void Scanner::driverFA(){
+// Diver to check if given word is acceptable
+string Scanner::driverFA(){
 	if(wordToCheck == "EOF"){
 		acceptingToken = "EOF";
 		findTokenType(1022);
-		return;
+		return "";
 	}
 	int state = 1;
 	int nextState;
 	char nextChar;
 	unsigned int position = 0;
 	string potenToken = "";
-	//	for(char letter : wordToCheck){
 	while(state < FINAL){
 		nextChar = getLetter(position);
-		//cout<<state<<" state its in\n";
 		nextState = fsaTable[state][nextChar];
-		//cout<<nextState<<" Checking next state\n";
+		// If FAIL
 		if(nextState < ERROR){
 			wordCount += position;
-			findError(nextState);
-			return;
+			return findError(nextState);
 		}
+		// If SUCCSESS
 		if(nextState > FINAL){
 			if((state != 8) and ((potenToken == ":" and nextChar == '=') or (potenToken == "=" and nextChar == '='))){
 				state = 8;
@@ -125,28 +105,24 @@ void Scanner::driverFA(){
 				acceptingToken = wordToCheck.substr(0, position);
 				findTokenType(nextState);
 				wordToCheck = wordToCheck.substr(position, (wordToCheck.size()-position));
-				//cout<<"\n\n"<<wordToCheck<<" new substring we have\n\n";
 				state = 1;
 				wordCount += position;
 				position = -1;
 				potenToken = "";
 			}
 			else{
-				//cout<<"\n\nposition not less anymore\n\n";
 				acceptingToken = wordToCheck;
-				findTokenType(nextState);
-				return;
+				return findTokenType(nextState);
 			}	
 		}
-		else{
+		// If still checking
+		else{	
 			state = nextState;
 			potenToken += nextChar;
 		}
 		position++;
-		//	if(getLetter(position) == '\0')
-		//		break;
 	}
-	//	}
+	return "{ERROR}: Something went wrong";
 }
 
 void Scanner::setupFSAtable() {
@@ -192,11 +168,12 @@ Accepting:
 	int j;
 	vector<int> header;
 	vector<int> state_1;	// For White Space
-
+	// Build table by setting everything to reject state
 	for(i=0; i < asciiMax; i++){
 		header.push_back(i);
 		state_1.push_back(-1);
 	}
+	// Add header for later print the table
 	fsaTable.push_back(header);
 
 	int accept = 999;
@@ -204,7 +181,6 @@ Accepting:
 	for(j=0; j < 22; j++){
 		// Set up header of the matrix
 		for(i=0; i < asciiMax; i++){
-			//header.push_back(i);
 			if(i == 32){	// WS
 				if(j==0)
 					state_1[i] = 1;
@@ -466,8 +442,6 @@ Accepting:
 			}
 
 		}
-		//fsaTable.push_back(header);
 		fsaTable.push_back(state_1);// ]
 	}
-
 }
