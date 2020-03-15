@@ -155,6 +155,9 @@ vector<string> read_file(string file_name){
 		line = filterElement(line);
 		stringstream iss(line);
 		while(iss >> word) {
+			if(word == "#"){
+				continue;
+			}
 			size_t start = word.find_first_not_of(WHITESPACE);	// Trim left
 			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
 			string trimmed_word = word.substr(start, end+1);
@@ -184,12 +187,21 @@ string filterElement(string line){
 	stringstream iss(line);
 	string word = "";
 	static bool found = false;
+	if(line == "#"){
+		found = found ? false : true;
+		return "#";
+	}
 	while(iss >> word){
+		if(word == "#"){
+			found = found ? false : true;
+			prev_pos = pos = 0;
+			continue;
+		}
 		for(char letter : word){
 			if(letter == '#'){
 				if(!found){
-					new_line +=  word.substr(prev_pos, pos-prev_pos) + " ";
-					prev_pos = pos;
+					new_line +=  word.substr(prev_pos, (pos-prev_pos)) + " ";
+					prev_pos = pos+1;
 					found = true;
 				}
 				else{
@@ -199,9 +211,11 @@ string filterElement(string line){
 			}
 			pos++;
 		}
-		if(!found && prev_pos < pos)
-			new_line += " " + word.substr(prev_pos, pos);
+		if(!found && prev_pos < pos){
+			new_line += word.substr(prev_pos, pos) + " ";
+			prev_pos = pos = 0;
+		}
+		prev_pos = pos = 0;
 	}
-	//cout<<new_line<<endl;
 	return new_line;
 }
