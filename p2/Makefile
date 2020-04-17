@@ -5,7 +5,7 @@ CHILD_CFILE =
 MASTER_OBJ=$(MASTER_CFILE:.cpp=.o)
 CHILD_OBJ=$(CHILD_CFILE:.cpp=.o)
 
-MASTER_EXE = scanner
+MASTER_EXE = parse
 CHILD_EXE = 
 
 CFLAGS = -g -Wall
@@ -15,9 +15,9 @@ HEADER_FILE =
 
 CPP_11 = -std=c++11
 
-SRC =
-SHARE_OBJ = scanner.o
-SHARE_HEAD = scanner.h
+SRC = 
+SHARE_OBJ = scanner.o parser.o
+SHARE_HEAD = scanner.h parser.h node.h 
 
 %.o: %.cpp	$(SHARE_HEAD)
 	$(CC) $(CPP_11) -c -o $@ $< $(CFLAGS)

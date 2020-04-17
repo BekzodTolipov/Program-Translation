@@ -2,26 +2,34 @@
 #include <string>
 #include <vector>
 #include <iostream>
+//#include "parser.h"
 
 using namespace std;
 #ifndef SCANNER_H
 #define SCANNER_H
 
+struct tokenInfo {
+	string tokenType;
+	int line;
+	int charToWord;
+	string token;
+};
+
 class Scanner {
 	// Structure to keep track internally
-	struct tokenInfo{
-		string tokenType;
-		int line;
-		int charToWord;
-		string token;
-	};
+//	struct tokenInfo{
+//		string tokenType;
+//		int line;
+///		int charToWord;
+//		string token;
+//	};
 	private:
 	string wordToCheck;	// Checking in progress word
 	string acceptingToken;	// Finished checking now will accept that word
 	int lineCount;	// Which line word was read
 	int wordCount;	// Which column it was found
 	struct tokenInfo temp;	// Temp storage for token
-	vector<vector<int>> fsaTable;
+	vector< vector<int> > fsaTable;
 
 	vector<tokenInfo> tokens;	// All tokens which was read during execution
 	// All accepting token types
@@ -67,15 +75,17 @@ class Scanner {
 	public:
 	// Prototypes
 	Scanner();
+	tokenInfo scanner(FILE *fp);
 	void printTheWord();
-	string setNewWord(string newWord, int lineCount, int wordCount);
+	tokenInfo setNewWord(string newWord, int lineCount, int wordCount);
 	void setupFSAtable();
-	string driverFA();
+	tokenInfo driverFA();
 	char getLetter(unsigned int);
-	string findTokenType(int);
+	tokenInfo findTokenType(int);
 	string findError(int);
 	void addToStruct(int);
 	string printTokens();
+	string filterElement(string line);
 };
 
 #endif

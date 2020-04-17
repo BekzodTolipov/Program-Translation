@@ -16,7 +16,7 @@ void Scanner::printTheWord() {
 }
 // Start the scanner by adding the values into its struct and run 
 // driverFA() and return its result
-string Scanner::setNewWord(string newWord, int line, int word) {
+tokenInfo Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
@@ -45,20 +45,20 @@ string Scanner::printTokens(){
 	return msg;
 }
 // Identify token type, such as identifier, reserved or operator
-string Scanner::findTokenType(int state){
+tokenInfo Scanner::findTokenType(int state){
 	int check = state-1001;
 	string result = "";
 	if(find(reservedWords.begin(), reservedWords.end(), acceptingToken) != reservedWords.end()){
 		addToStruct(22);// resWord	
 		result = printTokens();
 		tokens.push_back(temp);
-		return result;
+		return temp;
 	}
 	else{
 		addToStruct(check);
 		result = printTokens();
 		tokens.push_back(temp);
-		return result;
+		return temp;
 	}
 }
 // Fail token error to print
@@ -71,12 +71,95 @@ string Scanner::findError(int state){
 	cout<<msg<<endl;
 	return msg;
 }
+
+tokenInfo Scanner::scanner(FILE *fp){
+
+	if(!fp) {	// File does not exist
+		cout << "[ERROR] Unable to open file\n";
+		exit(1); // terminate with error
+	}
+
+	string line;
+	string word;
+	tokenInfo result;
+	string WHITESPACE = "\n\r\t\f\v";
+	static int line_count = 0;
+	string filtered_word = "";
+	const int MAX_SIZE = 1024;
+	char buff[MAX_SIZE];
+	while(!fgets(buff, MAX_SIZE, fp)){
+		line = buff;
+		int space_to_word = 0;
+		line = filterElement(line);
+		stringstream iss(line);
+		while(iss >> word) {
+			if(word == "#"){
+				continue;
+			}
+			size_t start = word.find_first_not_of(WHITESPACE);	// Trim left
+			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
+			string trimmed_word = word.substr(start, end+1);
+		//	file_vals.push_back(trimmed_word);
+			result = setNewWord(trimmed_word, line_count+1, space_to_word);
+		//	if(result.find("SCANNER ERROR:") != std::string::npos){
+		//		exit(-1);
+		//	}
+			space_to_word += word.size();
+		}
+		line_count++;
+	}
+	setNewWord("EOF", line_count+1, 0);
+}
+
+// Will receive a line from file 
+// and check if it contains comment
+// and filters them out
+string Scanner::filterElement(string line){
+	int pos = 0;
+	int prev_pos = 0;
+	string new_line = "";
+	stringstream iss(line);
+	string word = "";
+	static bool found = false;
+	if(line == "#"){
+		found = found ? false : true;
+		return "#";
+	}
+	while(iss >> word){
+		if(word == "#"){
+			found = found ? false : true;
+			prev_pos = pos = 0;
+			continue;
+		}
+		for(char letter : word){
+			if(letter == '#'){
+				if(!found){
+					new_line +=  word.substr(prev_pos, (pos-prev_pos)) + " ";
+					prev_pos = pos+1;
+					found = true;
+				}
+				else{
+					prev_pos = pos+1;
+					found = false;
+				}	
+			}
+			pos++;
+		}
+		if(!found && prev_pos < pos){
+			new_line += word.substr(prev_pos, pos) + " ";
+			prev_pos = pos = 0;
+		}
+		prev_pos = pos = 0;
+	}
+	return new_line;
+}
+
 // Diver to check if given word is acceptable
-string Scanner::driverFA(){
+tokenInfo Scanner::driverFA(){
 	if(wordToCheck == "EOF"){
 		acceptingToken = "EOF";
 		findTokenType(1022);
-		return "";
+		return temp;
 	}
 	int state = 1;
 	int nextState;
@@ -89,7 +172,8 @@ string Scanner::driverFA(){
 		// If FAIL
 		if(nextState < ERROR){
 			wordCount += position;
-			return findError(nextState);
+			findError(nextState);
+			exit(-1);
 		}
 		// If SUCCSESS
 		if(nextState > FINAL){
@@ -122,7 +206,7 @@ string Scanner::driverFA(){
 		}
 		position++;
 	}
-	return "{ERROR}: Something went wrong";
+	//return null;
 }
 
 void Scanner::setupFSAtable() {

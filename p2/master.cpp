@@ -5,51 +5,50 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <vector>
-#include "scanner.h"
+#include "parser.h"
+//#include "treePrint.h"
+
 using namespace std; 
 
 // Prototypes
 string convert_to_string(char* a, int size);
 void my_get_opt(int argc, char*argv[]);
 int validate_cmd_line(int argc, char* argv[]);
-vector<string> read_file(string file_name);
 vector<string> read_user_input();
 void is_file_empty(vector<string> file_content);
-string filterElement(string);
 
 //Global varaibles
 string file_name;
 bool is_file_given = false;
 const int MAXCHAR = 1024;
 
-// Scanner
-Scanner newScanner;
-
 int main(int argc, char*argv[]){ 
-	vector<string> temp;
+//	vector<string> temp;
+	int level = 0;
 	cout<<"\nWelcome to simple Scanner to tokenize the given file\n";
 
 	if(validate_cmd_line(argc, argv) == -1){	// Check commend line for arguments
-		temp = read_user_input();
+	//	temp = read_user_input();
 	}
 	else{
 		my_get_opt(argc, argv);
 		if(is_file_given){
-			temp = read_file(file_name);	// Read the file
+	//		fp = fopen(file_name.c_str(), "r");
+			//temp = read_file(file_name);	// Read the file
 		}
 		else{
 			int size = strlen(argv[1]);
 			file_name = convert_to_string(argv[1], size);	// If file is given without option than convert it
 			file_name.append(".sp2020");
-			temp = read_file(file_name);
+		//	fp = fopen(file_name.c_str(), "r");
+			//temp = read_file(file_name);
 		}
 	}
 
-	// Open a stream to output to a file
+	Node *parseTree = parser(file_name);
+	//printTree(parseTree, level);
 
-	//ofstream file;
-	//file.open("output.inorder");
-	//file.close();
+	fclose(fp);
 
 	cout<<endl;
 
@@ -131,91 +130,4 @@ int validate_cmd_line(int argc, char* argv[]){
 		cout<<"[REDIRECT] No input file is given launching user input!\n";
 		return -1;	// no file is given
 	}
-}
-
-// Read the file given
-vector<string> read_file(string file_name){
-	//Scanner newScanner;
-	vector<string> file_vals;
-	ifstream file;
-	file.open(file_name);	// Open given file
-
-	if(!file) {	// File does not exist
-		cout << "[ERROR] Unable to open file\n";
-		exit(1); // terminate with error
-	}
-	string line;
-	string word;
-	string result;
-	string WHITESPACE = "\n\r\t\f\v";
-	int line_count = 0;
-	string filtered_word = "";
-	while(getline(file, line)){
-		int space_to_word = 0;
-		line = filterElement(line);
-		stringstream iss(line);
-		while(iss >> word) {
-			if(word == "#"){
-				continue;
-			}
-			size_t start = word.find_first_not_of(WHITESPACE);	// Trim left
-			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
-			string trimmed_word = word.substr(start, end+1);
-			file_vals.push_back(trimmed_word);
-			result = newScanner.setNewWord(trimmed_word, line_count+1, space_to_word);
-			if(result.find("SCANNER ERROR:") != std::string::npos){
-				exit(-1);
-			}
-			space_to_word += word.size();
-		}
-		line_count++;
-	}
-	newScanner.setNewWord("EOF", line_count+1, 0);
-
-	is_file_empty(file_vals);	// Check if file is empty
-
-	file.close();
-	return file_vals;
-}
-// Will receive a line from file 
-// and check if it contains comment
-// and filters them out
-string filterElement(string line){
-	int pos = 0;
-	int prev_pos = 0;
-	string new_line = "";
-	stringstream iss(line);
-	string word = "";
-	static bool found = false;
-	if(line == "#"){
-		found = found ? false : true;
-		return "#";
-	}
-	while(iss >> word){
-		if(word == "#"){
-			found = found ? false : true;
-			prev_pos = pos = 0;
-			continue;
-		}
-		for(char letter : word){
-			if(letter == '#'){
-				if(!found){
-					new_line +=  word.substr(prev_pos, (pos-prev_pos)) + " ";
-					prev_pos = pos+1;
-					found = true;
-				}
-				else{
-					prev_pos = pos+1;
-					found = false;
-				}	
-			}
-			pos++;
-		}
-		if(!found && prev_pos < pos){
-			new_line += word.substr(prev_pos, pos) + " ";
-			prev_pos = pos = 0;
-		}
-		prev_pos = pos = 0;
-	}
-	return new_line;
 }
