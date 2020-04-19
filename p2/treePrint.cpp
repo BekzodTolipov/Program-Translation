@@ -1,33 +1,34 @@
 #include <iostream>
 #include "treePrint.h"
 
-string tokenNames[] = {"Identifier", "Number", "Begin keyword", "End keyword", "Start keyword", "Finish keyword",
-                       "Then keyword", "If keyword", "Loop keyword", "Integer keyword", "Do keyword", "Scan keyword",
-                       "Print keyword", "Void keyword", "Return keyword", "Program keyword", "Dummy keyword",
-                       "Relational Operator", "Other Operator", "Delimeter", "End of File", "Error"};
-
-void printTree(node_t *root, int level) {
+void printTree(Node *root, int level) {
     if (root == NULL) {
         return;
-    } else { //process node
+    } 
+	else { //process node
+
+		string line;
+		tokenInfo tkn;
+
         for (int i = 0; i < level; i++) {
-            cout << "  ";
+            line.append("_");
         }
         level++;
 
-        cout << root->label << "\t";
-        tokenInfo token = root->token_t;
-        if (token.name != "") {
-            cout <<  "Token ID: " + tokenNames[token.tokenId] + " Instance: " + token.name << endl;
-        }
+        line.append(root->label.c_str());
+        line.append(" ");
+        
+		for(int j = 0; j < root->tkn.size(); j++){
+			tkn = root->tkn[j];
+			line.append(tkn.token);
+			line.append(" | ");
+		}
+		cout<<line<<endl;
 
-        cout << "\n";
-
-        //recursively process children
-        printTree(root->child1, level);
-        printTree(root->child2, level);
-        printTree(root->child3, level);
-        printTree(root->child4, level);
-        printTree(root->child5, level);
+        printTree(root->child_1, level+1);
+        printTree(root->child_2, level+1);
+        printTree(root->child_3, level+1);
+        printTree(root->child_4, level+1);
+        printTree(root->child_5, level+1);
     }
 }

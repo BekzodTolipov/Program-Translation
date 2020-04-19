@@ -3,6 +3,6 @@
 
 #include "node.h"
 
-void printTree(node_t *p, int level);
+void printTree(Node *p, int level);
 
 #endif

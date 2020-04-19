@@ -20,7 +20,7 @@ tokenInfo Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
-	return driverFA();
+//	return driverFA();
 }
 // Extract letter from word
 char Scanner::getLetter(unsigned int pos){
@@ -29,10 +29,19 @@ char Scanner::getLetter(unsigned int pos){
 	}
 	return wordToCheck[pos];
 }
+
+tokenInfo Scanner::getEmptyToken(){
+	tokenInfo dummy;
+	dummy.tokenType = "emptyToken";
+	dummy.token = "Empty";
+	dummy.line = temp.line;
+	return dummy;
+}
+
 // Keeping it inside struct native to Scanner
 void Scanner::addToStruct(int pos){
 	temp.tokenType = tokenType[pos];
-	temp.token = acceptingToken;
+	temp.token = wordToCheck;
 	temp.line = lineCount;
 	temp.charToWord = wordCount;
 }
@@ -48,14 +57,20 @@ string Scanner::printTokens(){
 tokenInfo Scanner::findTokenType(int state){
 	int check = state-1001;
 	string result = "";
-	if(find(reservedWords.begin(), reservedWords.end(), acceptingToken) != reservedWords.end()){
-		addToStruct(22);// resWord	
+//	cout<<"TOKEN WORD CURRENTLY: "<<temp.token<<"RRR\n\n"<<endl;
+//	temp.token += '\0';
+	if(find(reservedWords.begin(), reservedWords.end(), temp.token) != reservedWords.end()){
+	//	addToStruct(22);// resWord	
+//		cout<<"\n\nFOUND RESERVED WORD\n\n";
+		temp.tokenType = tokenType[22];
 		result = printTokens();
 		tokens.push_back(temp);
 		return temp;
 	}
 	else{
-		addToStruct(check);
+		//addToStruct(check);
+		temp.tokenType = tokenType[check];
+//		cout<<"\n\nFOUND IDENTIFIER WORD\n\n";
 		result = printTokens();
 		tokens.push_back(temp);
 		return temp;
@@ -72,103 +87,46 @@ string Scanner::findError(int state){
 	return msg;
 }
 
-tokenInfo Scanner::scanner(FILE *fp){
-
-	if(!fp) {	// File does not exist
-		cout << "[ERROR] Unable to open file\n";
-		exit(1); // terminate with error
-	}
-
-	string line;
-	string word;
-	tokenInfo result;
-	string WHITESPACE = "\n\r\t\f\v";
-	static int line_count = 0;
-	string filtered_word = "";
-	const int MAX_SIZE = 1024;
-	char buff[MAX_SIZE];
-	while(!fgets(buff, MAX_SIZE, fp)){
-		line = buff;
-		int space_to_word = 0;
-		line = filterElement(line);
-		stringstream iss(line);
-		while(iss >> word) {
-			if(word == "#"){
-				continue;
-			}
-			size_t start = word.find_first_not_of(WHITESPACE);	// Trim left
-			size_t end = word.find_last_not_of(WHITESPACE);	// Trim right
-			string trimmed_word = word.substr(start, end+1);
-		//	file_vals.push_back(trimmed_word);
-			result = setNewWord(trimmed_word, line_count+1, space_to_word);
-		//	if(result.find("SCANNER ERROR:") != std::string::npos){
-		//		exit(-1);
-		//	}
-			space_to_word += word.size();
-		}
-		line_count++;
-	}
-	setNewWord("EOF", line_count+1, 0);
-}
-
-// Will receive a line from file 
-// and check if it contains comment
-// and filters them out
-string Scanner::filterElement(string line){
-	int pos = 0;
-	int prev_pos = 0;
-	string new_line = "";
-	stringstream iss(line);
-	string word = "";
-	static bool found = false;
-	if(line == "#"){
-		found = found ? false : true;
-		return "#";
-	}
-	while(iss >> word){
-		if(word == "#"){
-			found = found ? false : true;
-			prev_pos = pos = 0;
-			continue;
-		}
-		for(char letter : word){
-			if(letter == '#'){
-				if(!found){
-					new_line +=  word.substr(prev_pos, (pos-prev_pos)) + " ";
-					prev_pos = pos+1;
-					found = true;
-				}
-				else{
-					prev_pos = pos+1;
-					found = false;
-				}	
-			}
-			pos++;
-		}
-		if(!found && prev_pos < pos){
-			new_line += word.substr(prev_pos, pos) + " ";
-			prev_pos = pos = 0;
-		}
-		prev_pos = pos = 0;
-	}
-	return new_line;
-}
-
 // Diver to check if given word is acceptable
-tokenInfo Scanner::driverFA(){
-	if(wordToCheck == "EOF"){
-		acceptingToken = "EOF";
-		findTokenType(1022);
-		return temp;
-	}
+tokenInfo Scanner::driverFA(FILE *fp){
+//	if(wordToCheck == "EOF"){
+//		acceptingToken = "EOF";
+//		findTokenType(1022);
+//		return temp;
+//	}
 	int state = 1;
 	int nextState;
 	char nextChar;
+	static int line = 0;
 	unsigned int position = 0;
 	string potenToken = "";
+	string WHITESPACE = "\n\r\t\f\v";
+
+//	cout<<"driverFA: potenToken: "<<potenToken<<endl;
+
 	while(state < FINAL){
-		nextChar = getLetter(position);
+		nextChar = fgetc(fp);
+		//cout<<"NEXT CHAR: "<<(int)nextChar<<endl;
+		if(nextChar == EOF && potenToken == ""){
+		//	cout<<"I should print\n";
+			temp.tokenType = "EOFToken";
+			temp.line = line;
+			temp.token = "EOF";
+			break;
+		}
+		//if(nextChar == ' ' && potenToken == "")
+		//	cout<<"\nSPACE\n";
+	//	cout<<(int)nextChar<<endl;
+
+		if(nextChar == '#'){
+			while(nextChar != '\n'){
+				nextChar = fgetc(fp);
+			}
+			line++;
+		}
+
 		nextState = fsaTable[state][nextChar];
+		//cout<<nextState<<endl;
 		// If FAIL
 		if(nextState < ERROR){
 			wordCount += position;
@@ -176,36 +134,44 @@ tokenInfo Scanner::driverFA(){
 			exit(-1);
 		}
 		// If SUCCSESS
-		if(nextState > FINAL){
-			if((state != 8) and ((potenToken == ":" and nextChar == '=') or (potenToken == "=" and nextChar == '='))){
-				state = 8;
-				continue;
-			}
-			else if((state == 8) and ((potenToken == ":" and nextChar == '=') or (potenToken == "=" and nextChar == '='))){
-				position++;
-			}
+		if(nextState >= FINAL){
+				//cout<<"SCANNER: TOKEN: "<<potenToken<<endl;
+				size_t start = potenToken.find_first_not_of(WHITESPACE);	// Trim left
+				size_t end = potenToken.find_last_not_of(WHITESPACE);	// Trim right
+				potenToken = potenToken.substr(start, end+1);
+		
+				string trimmed = "";
+				for(int i=0; i<potenToken.length(); i++){
+					if(!isspace(potenToken[i])){
+						trimmed += potenToken[i];
+					}
+				}
+				//cout<<"SCANNER: TOKEN: "<<trimmed<<endl;
 
-			if(position < wordToCheck.size()){
-				acceptingToken = wordToCheck.substr(0, position);
+				acceptingToken = temp.token = trimmed;
+				//potenToken += '\n';
+				//setNewWord(potenToken, line, 0);
 				findTokenType(nextState);
-				wordToCheck = wordToCheck.substr(position, (wordToCheck.size()-position));
-				state = 1;
-				wordCount += position;
-				position = -1;
-				potenToken = "";
-			}
-			else{
-				acceptingToken = wordToCheck;
-				return findTokenType(nextState);
-			}	
+				//acceptingToken = temp.token = potenToken;
+				temp.line = line;
+				temp.charToWord = 0;
+				return temp;
+			//}	
 		}
 		// If still checking
-		else{	
+		else{
+			//cout<<FINAL<<endl;	
 			state = nextState;
 			potenToken += nextChar;
 		}
 		position++;
 	}
+	
+	//temp.tokenType = "EOFToken";
+	//temp.line = line;
+	//temp.token = "EOF";
+	return temp;
+	//cout<<potenToken<<endl;
 	//return null;
 }
 
@@ -265,13 +231,16 @@ Accepting:
 	for(j=0; j < 22; j++){
 		// Set up header of the matrix
 		for(i=0; i < asciiMax; i++){
-			if(i == 32){	// WS
+			if(i == 10) {
+				state_1[i] = accept+j+1;
+			}
+			else if(i == 32){	// WS
 				if(j==0)
 					state_1[i] = 1;
 				else if(j==7)
 					state_1[i] = -3;
 				else
-					state_1[i] = accept+j;
+					state_1[i] = accept+j+1;
 			}
 			else if(i == 37){	// Percent
 				if(j==0){

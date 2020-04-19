@@ -79,13 +79,14 @@ class Scanner {
 	void printTheWord();
 	tokenInfo setNewWord(string newWord, int lineCount, int wordCount);
 	void setupFSAtable();
-	tokenInfo driverFA();
+	tokenInfo driverFA(FILE *fp);
 	char getLetter(unsigned int);
 	tokenInfo findTokenType(int);
 	string findError(int);
 	void addToStruct(int);
 	string printTokens();
 	string filterElement(string line);
+	tokenInfo getEmptyToken();
 };
 
 #endif

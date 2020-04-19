@@ -16,8 +16,8 @@ HEADER_FILE =
 CPP_11 = -std=c++11
 
 SRC = 
-SHARE_OBJ = scanner.o parser.o
-SHARE_HEAD = scanner.h parser.h node.h 
+SHARE_OBJ = scanner.o parser.o treePrint.o
+SHARE_HEAD = scanner.h parser.h node.h treePrint.h
 
 %.o: %.cpp	$(SHARE_HEAD)
 	$(CC) $(CPP_11) -c -o $@ $< $(CFLAGS)

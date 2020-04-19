@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "parser.h"
-//#include "treePrint.h"
+#include "treePrint.h"
 
 using namespace std; 
 
@@ -33,22 +33,24 @@ int main(int argc, char*argv[]){
 	else{
 		my_get_opt(argc, argv);
 		if(is_file_given){
-	//		fp = fopen(file_name.c_str(), "r");
+			//fp = popen(file_name.c_str(), "r");
 			//temp = read_file(file_name);	// Read the file
 		}
 		else{
 			int size = strlen(argv[1]);
 			file_name = convert_to_string(argv[1], size);	// If file is given without option than convert it
 			file_name.append(".sp2020");
-		//	fp = fopen(file_name.c_str(), "r");
+			//cout<<"PRINTING: filename: "<<file_name<<endl;
+			//fp = popen(file_name.c_str(), "r");
+			//cout<<"PRINTING: filename: "<<file_name<<endl;
 			//temp = read_file(file_name);
 		}
 	}
 
 	Node *parseTree = parser(file_name);
-	//printTree(parseTree, level);
+	printTree(parseTree, 0);
 
-	fclose(fp);
+	pclose(fp);
 
 	cout<<endl;
 
