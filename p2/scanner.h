@@ -53,7 +53,7 @@ class Scanner {
 		"rightCurlyToken",
 		"semicolonToken",
 		"leftBrackToken",
-		"rightBreacketToken",
+		"rightBracketToken",
 		"EOFToken",
 		"resWordToken"
 	};

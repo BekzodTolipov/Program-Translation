@@ -14,7 +14,7 @@ Node *parser(string filename) {
 	root = program();
 	
 	if(tkn.tokenType == "EOFToken") {
-		fclose(fp);
+		//fclose(fp);
 		//root->tkn.push_back(tkn);
 		return root;
 	} 
@@ -48,7 +48,7 @@ Node *program() {
 
 // <block> -> { <vars> <stats> }
 Node *block() {
-	printf("Entered block\n");
+	cout<<"Entered block(); tokenType: "<<tkn.tokenType<<endl;
 	// Create new node
 	Node *newNode = createNode("<block>");
 	
@@ -81,7 +81,7 @@ Node *block() {
 
 //<vars> -> empty | declare Identifier := Integer ; <vars>
 Node *vars(){
-	cout<<"Entered vars()\n";
+	cout<<"Entered vars(); tokenType: "<<tkn.tokenType<<endl;
 	//Create new node
 	Node* newNode = createNode("<vars>");
 
@@ -268,7 +268,7 @@ Node *mStat(){
 
 // <stat> -> <in> ; | <out> ; | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ; | <block>
 Node *stat(){
-	cout<<"Entered stat()\n";
+	cout<<"Entered stat(); tokenType: "<<tkn.tokenType<<endl;
 	Node *newNode = createNode("<stat>");
 
 	if(tkn.tokenType == "resWordToken"){
@@ -406,6 +406,7 @@ Node *in(){
 
 // <out> -> out <expr>
 Node *out(){
+	cout<<"Entered out()\n";
 	Node *newNode = createNode("<out>");
 
 	newNode->child_1 = expr();
@@ -424,7 +425,7 @@ Node *iffy(){
 		newNode->child_2 = RO();
 		newNode->child_3 = expr();
 
-		if(tkn.tokenType == "rightBreacketToken"){
+		if(tkn.tokenType == "rightBracketToken"){
 			tkn = scan.driverFA(fp);
 
 			if(tkn.token == "then"){
@@ -453,6 +454,7 @@ Node *iffy(){
 
 // <loop> -> loop [ <expr> <RO> <expr> ] <stat>
 Node *loop(){
+	cout<<"Entered loop();\n";
 	Node *newNode = createNode("<loop>");
 
 	if(tkn.tokenType == "leftBrackToken"){
@@ -462,7 +464,7 @@ Node *loop(){
 		newNode->child_2 = RO();
 		newNode->child_3 = expr();
 
-		if(tkn.tokenType == "rightBrackToken"){
+		if(tkn.tokenType == "rightBracketToken"){
 			tkn = scan.driverFA(fp);
 
 			newNode->child_4 = stat();
@@ -483,6 +485,7 @@ Node *loop(){
 
 // <assign> -> Identifier := <expr>
 Node *assign(){
+	cout<<"Entered assign();";
 	Node *newNode = createNode("<assign>");
 
 	if(tkn.tokenType == "colonEqToken"){
@@ -500,6 +503,7 @@ Node *assign(){
 
 // <label> -> label Identifier
 Node *label(){
+	cout<<"Entered label();";
 	Node *newNode = createNode("<label>");
 
 	if(tkn.tokenType == "idToken"){
@@ -517,6 +521,7 @@ Node *label(){
 
 // <goto> -> goto Identifier
 Node *goTo(){
+	cout<<"Entered goto();";
 	Node *newNode = createNode("<goto>");
 
 	if(tkn.tokenType == "idToken"){
@@ -533,8 +538,8 @@ Node *goTo(){
 }
 
 // <RO> -> < | << (two tokens) | > | >> (two tokens) | == (one token ==) | <> (two tokens) 
-Node *RO()
-{
+Node *RO(){
+	cout<<"Entered RO();";
 	//Create the node <RO>
 	Node *newNode = createNode("<RO>");
 
@@ -556,10 +561,10 @@ Node *RO()
 				tkn = scan.driverFA(fp);
 				return newNode;
 			}
-			else if(tkn.tokenType != "lessThanToken" || tkn.tokenType != "greaterThanToken") {
-        		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
-				exit(EXIT_FAILURE);
-			} 
+		//	else if(tkn.tokenType != "lessThanToken" || tkn.tokenType != "greaterThanToken" || tkn.tokenType != "intToken") {
+        //		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
+		//		exit(EXIT_FAILURE);
+		//	} 
 			else {
 				return newNode;
 			}

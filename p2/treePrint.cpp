@@ -16,6 +16,10 @@ void printTree(Node *root, int level) {
         level++;
 
         line.append(root->label.c_str());
+		if(root->label == ""){
+			cout<<"LABEL is empty()\n\n";
+		}
+	//	cout<<"{PRINT TREE}: Printing root label: "<<root->label.c_str()<<endl;
         line.append(" ");
         
 		for(int j = 0; j < root->tkn.size(); j++){
@@ -29,6 +33,5 @@ void printTree(Node *root, int level) {
         printTree(root->child_2, level+1);
         printTree(root->child_3, level+1);
         printTree(root->child_4, level+1);
-        printTree(root->child_5, level+1);
     }
 }

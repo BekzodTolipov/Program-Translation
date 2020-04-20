@@ -1,9 +1,7 @@
-declare x := 1 ;
-declare y := 2 ;
+declare x := 0 ;
 {
-declare z := 3 ;
-  { 
-    out 1 ;
-  } 
-  out 2 ;
+in x ;
+loop [ x + 2 / 3 < 0 - * 3 ]
+  iffy [ x < > 0 ] then 
+    out x ; ; ;
 }

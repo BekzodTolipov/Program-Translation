@@ -20,7 +20,7 @@ tokenInfo Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
-//	return driverFA();
+	//	return driverFA();
 }
 // Extract letter from word
 char Scanner::getLetter(unsigned int pos){
@@ -57,11 +57,11 @@ string Scanner::printTokens(){
 tokenInfo Scanner::findTokenType(int state){
 	int check = state-1001;
 	string result = "";
-//	cout<<"TOKEN WORD CURRENTLY: "<<temp.token<<"RRR\n\n"<<endl;
-//	temp.token += '\0';
+	//	cout<<"TOKEN WORD CURRENTLY: "<<temp.token<<"RRR\n\n"<<endl;
+	//	temp.token += '\0';
 	if(find(reservedWords.begin(), reservedWords.end(), temp.token) != reservedWords.end()){
-	//	addToStruct(22);// resWord	
-//		cout<<"\n\nFOUND RESERVED WORD\n\n";
+		//	addToStruct(22);// resWord	
+		//		cout<<"\n\nFOUND RESERVED WORD\n\n";
 		temp.tokenType = tokenType[22];
 		result = printTokens();
 		tokens.push_back(temp);
@@ -70,7 +70,7 @@ tokenInfo Scanner::findTokenType(int state){
 	else{
 		//addToStruct(check);
 		temp.tokenType = tokenType[check];
-//		cout<<"\n\nFOUND IDENTIFIER WORD\n\n";
+		//		cout<<"\n\nFOUND IDENTIFIER WORD\n\n";
 		result = printTokens();
 		tokens.push_back(temp);
 		return temp;
@@ -89,11 +89,11 @@ string Scanner::findError(int state){
 
 // Diver to check if given word is acceptable
 tokenInfo Scanner::driverFA(FILE *fp){
-//	if(wordToCheck == "EOF"){
-//		acceptingToken = "EOF";
-//		findTokenType(1022);
-//		return temp;
-//	}
+	//	if(wordToCheck == "EOF"){
+	//		acceptingToken = "EOF";
+	//		findTokenType(1022);
+	//		return temp;
+	//	}
 	int state = 1;
 	int nextState;
 	char nextChar;
@@ -102,46 +102,77 @@ tokenInfo Scanner::driverFA(FILE *fp){
 	string potenToken = "";
 	string WHITESPACE = "\n\r\t\f\v";
 
-//	cout<<"driverFA: potenToken: "<<potenToken<<endl;
+		cout<<"driverFA: potenToken: "<<potenToken<<endl;
 
 	while(state < FINAL){
 		nextChar = fgetc(fp);
-		//cout<<"NEXT CHAR: "<<(int)nextChar<<endl;
-		if(nextChar == EOF && potenToken == ""){
-		//	cout<<"I should print\n";
-			temp.tokenType = "EOFToken";
-			temp.line = line;
-			temp.token = "EOF";
-			break;
+		if(nextChar == -1){
+			if(potenToken == ""){
+				//ungetc(nextChar, fp);
+				temp.tokenType = "EOFToken";
+				temp.line = line;
+				temp.token = "EOF";
+				return temp;
+			}
+			//else{
+			//	ungetc(nextChar, fp);
+				
+			//}
 		}
-		//if(nextChar == ' ' && potenToken == "")
-		//	cout<<"\nSPACE\n";
-	//	cout<<(int)nextChar<<endl;
+		cout<<"Next char: "<<nextChar<<endl;
+	//	if(nextChar == '\n' && potenToken == ""){
+	//		line++;
+	//		continue;
+	//	}
 
 		if(nextChar == '#'){
-			while(nextChar != '\n'){
+			cout<<"[SCANNER]: Found comments!\n";
+			while(nextChar != '#' && nextChar != EOF){
+				//cout<<nextChar<<endl;
+				if(nextChar == '\n')
+					line++;
 				nextChar = fgetc(fp);
 			}
-			line++;
+			//if(nextChar == EOF){
+			//}
+			cout<<"[SCANNER]: Comments finished!\n";
+			continue;
 		}
 
 		nextState = fsaTable[state][nextChar];
-		//cout<<nextState<<endl;
-		// If FAIL
-		if(nextState < ERROR){
-			wordCount += position;
-			findError(nextState);
-			exit(-1);
-		}
-		// If SUCCSESS
-		if(nextState >= FINAL){
-				//cout<<"SCANNER: TOKEN: "<<potenToken<<endl;
-				size_t start = potenToken.find_first_not_of(WHITESPACE);	// Trim left
-				size_t end = potenToken.find_last_not_of(WHITESPACE);	// Trim right
-				potenToken = potenToken.substr(start, end+1);
-		
+		cout<<"Next state: "<<nextState<<endl;
+		//cin>>position;
+		if(nextState >= 1000 || nextState == -99){
+			if(nextChar == '\n'){
+				line++;
+			}
+			if(nextState == -99){
+				ungetc(nextChar, fp);
+				temp.tokenType = "EOFToken";
+				temp.line = line;
+				temp.token = "EOF";
+				return temp;
+			}
+			// If FAIL
+			if(nextState < ERROR){
+				wordCount += position;
+				temp.line = line;
+				findError(nextState);
+				exit(-1);
+			}
+			// If SUCCSESS
+			if(nextState >= FINAL){
+			//	if(potenToken == ""){
+			//		ungetc(nextChar, fp);
+			//		return getEmptyToken();
+			//	}
+				cout<<"SCANNER: TOKEN: "<<potenToken<<endl;
+			//	size_t start = potenToken.find_first_not_of(WHITESPACE);	// Trim left
+		//		size_t end = potenToken.find_last_not_of(WHITESPACE);	// Trim right
+		//		potenToken = potenToken.substr(start, end+1);
+
 				string trimmed = "";
-				for(int i=0; i<potenToken.length(); i++){
+				for(int i=0; i < potenToken.length(); i++){
 					if(!isspace(potenToken[i])){
 						trimmed += potenToken[i];
 					}
@@ -155,24 +186,32 @@ tokenInfo Scanner::driverFA(FILE *fp){
 				//acceptingToken = temp.token = potenToken;
 				temp.line = line;
 				temp.charToWord = 0;
+			//	ungetc(nextChar, fp);
 				return temp;
-			//}	
+				//}	
 		}
 		// If still checking
-		else{
-			//cout<<FINAL<<endl;	
-			state = nextState;
+		//	else{
+		//cout<<FINAL<<endl;	
+		//		state = nextState;
+		//		potenToken += nextChar;
+		//	}
+	}
+	else{
+		cout<<"Check next char and add to potenToken: "<<nextChar<<endl;
+		if(!isspace(nextChar)){
 			potenToken += nextChar;
 		}
-		position++;
+		state = nextState;
 	}
-	
-	//temp.tokenType = "EOFToken";
-	//temp.line = line;
-	//temp.token = "EOF";
-	return temp;
-	//cout<<potenToken<<endl;
-	//return null;
+}
+
+//temp.tokenType = "EOFToken";
+//temp.line = line;
+//temp.token = "EOF";
+return temp;
+//cout<<potenToken<<endl;
+//return null;
 }
 
 void Scanner::setupFSAtable() {
@@ -187,6 +226,7 @@ Errors:
 -3: = is not accepted by itself
 -4:
 -5:
+-99: EOF
 
 Accepting:
 1001: Identifiers
@@ -231,8 +271,20 @@ Accepting:
 	for(j=0; j < 22; j++){
 		// Set up header of the matrix
 		for(i=0; i < asciiMax; i++){
-			if(i == 10) {
-				state_1[i] = accept+j+1;
+			if(i == 10) {	// NEW-LINE
+				if(j==0)
+					state_1[i] = 1;
+				else if(j==7)
+					state_1[i] = -3;
+				else
+					state_1[i] = accept+j+1;
+			}
+			else if(i == 26){	// EOF
+				if(j==0)
+					state_1[i] = 1;
+				else{
+					state_1[i] = accept+j+1;
+				}
 			}
 			else if(i == 32){	// WS
 				if(j==0)
