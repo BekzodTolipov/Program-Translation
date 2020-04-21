@@ -8,14 +8,13 @@ Scanner scan;
 Node *parser(string filename) {
 	fp = fopen(filename.c_str(), "r");
 	tkn = scan.driverFA(fp);
-	
+
 	// Create root node
 	Node *root = NULL;
 	root = program();
-	
+
 	if(tkn.tokenType == "EOFToken") {
-		//fclose(fp);
-		//root->tkn.push_back(tkn);
+		fclose(fp);
 		return root;
 	} 
 	else {
@@ -26,52 +25,35 @@ Node *parser(string filename) {
 
 // <program> -> program <vars> <block>
 Node *program() {
-	printf("Entered program\n");
-	// Create new node
+	cout<<"Entered program();\n";
 	Node *newNode = createNode("<program>");
-	
-	//if(tkn.token == "program") {
-	//	newNode->tkn.push_back(tkn);
-	//	tkn = scan.driverFA(fp);
-		
-		newNode->child_1 = vars();
-		newNode->child_2 = block();
-		
-		return newNode;
-		
-//	} 
-//	else {
-//		printf("Error on line %d: Expected \"program\"\n", tkn.line);
-//		exit(EXIT_FAILURE);
-//	}
+
+	newNode->child_1 = vars();
+	newNode->child_2 = block();
+
+	return newNode;
 }
 
 // <block> -> { <vars> <stats> }
 Node *block() {
 	cout<<"Entered block(); tokenType: "<<tkn.tokenType<<endl;
-	// Create new node
+
 	Node *newNode = createNode("<block>");
-	
+
 	if(tkn.tokenType == "leftCurlyToken") {
-		//newNode->tkn.push_back(tkn);
 		tkn = scan.driverFA(fp);
-		
+
 		newNode->child_1 = vars();
 		newNode->child_2 = stats();
-		
+
 		if(tkn.tokenType == "rightCurlyToken") {
-			//cout<<"Got }, now finishing returns\n";
-		//	newNode->tkn.push_back(tkn);
 			tkn = scan.driverFA(fp);
-		//	cout<<"Token should be EOF: "<<tkn.tokenType<<endl;		
 			return newNode;
-			
 		} 
 		else {
 			printf("Error on line %d: Expected \"}\"\n", tkn.line);
 			exit(EXIT_FAILURE);
 		}
-		
 	} 
 	else {
 		printf("Error on line %d: Expected \"{\" tkn\n", tkn.line);
@@ -82,11 +64,9 @@ Node *block() {
 //<vars> -> empty | declare Identifier := Integer ; <vars>
 Node *vars(){
 	cout<<"Entered vars(); tokenType: "<<tkn.tokenType<<endl;
-	//Create new node
 	Node* newNode = createNode("<vars>");
 
 	if(tkn.tokenType == "resWordToken" && tkn.token == "declare"){
-	//	newNode->tkn.push_back(tkn);
 		tkn = scan.driverFA(fp);
 
 		if(tkn.tokenType == "idToken"){
@@ -251,11 +231,11 @@ Node *mStat(){
 	Node *newNode = createNode("<mStat>");
 
 	if((tkn.tokenType == "resWordToken" && (tkn.token == "in" || tkn.token == "out" || tkn.token == "iffy" || tkn.token == "loop" || tkn.token == "label" || tkn.token == "goto")) 
-		|| 
-		(tkn.tokenType == "leftCurlyToken")
-		|| 
-		(tkn.tokenType == "idToken")
-	){
+			|| 
+			(tkn.tokenType == "leftCurlyToken")
+			|| 
+			(tkn.tokenType == "idToken")
+	  ){
 		newNode->child_1 = stat();
 		newNode->child_2 = mStat();
 		return newNode;
@@ -292,7 +272,6 @@ Node *stat(){
 			newNode->child_1 = out();
 
 			if(tkn.tokenType == "semicolonToken"){
-			//	cout<<"Got ;, now moving back to stats()\n";
 				tkn = scan.driverFA(fp);
 				return newNode;
 			}
@@ -303,63 +282,63 @@ Node *stat(){
 		}
 		else if(tkn.token == "iffy"){
 			tkn = scan.driverFA(fp);
-            newNode->child_1 = iffy();
+			newNode->child_1 = iffy();
 
-            if(tkn.tokenType == "semicolonToken"){
-                tkn = scan.driverFA(fp);
-                return newNode;
-            }
-            else{
-                printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
-                exit(EXIT_FAILURE);
-            }
+			if(tkn.tokenType == "semicolonToken"){
+				tkn = scan.driverFA(fp);
+				return newNode;
+			}
+			else{
+				printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
+				exit(EXIT_FAILURE);
+			}
 
 		}
 		else if(tkn.token == "loop"){
-             tkn = scan.driverFA(fp);
-             newNode->child_1 = loop();
+			tkn = scan.driverFA(fp);
+			newNode->child_1 = loop();
 
-            if(tkn.tokenType == "semicolonToken"){
-                tkn = scan.driverFA(fp);
- 		            return newNode;
-            }
-            else{
-                printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
-                exit(EXIT_FAILURE);
-             }
+			if(tkn.tokenType == "semicolonToken"){
+				tkn = scan.driverFA(fp);
+				return newNode;
+			}
+			else{
+				printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
+				exit(EXIT_FAILURE);
+			}
 
-        }
+		}
 		else if(tkn.token == "label"){
-            tkn = scan.driverFA(fp);
-            newNode->child_1 = label();
+			tkn = scan.driverFA(fp);
+			newNode->child_1 = label();
 
-            if(tkn.tokenType == "semicolonToken"){
-                tkn = scan.driverFA(fp);
-                return newNode;
-            }
-            else{
-                printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
-                exit(EXIT_FAILURE);
-            }
+			if(tkn.tokenType == "semicolonToken"){
+				tkn = scan.driverFA(fp);
+				return newNode;
+			}
+			else{
+				printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
+				exit(EXIT_FAILURE);
+			}
 
-        }
+		}
 		else if(tkn.token == "goto"){
-            tkn = scan.driverFA(fp);
-            newNode->child_1 = goTo();
+			tkn = scan.driverFA(fp);
+			newNode->child_1 = goTo();
 
-            if(tkn.tokenType == "semicolonToken"){
-                tkn = scan.driverFA(fp);
-                return newNode;
-            }
-            else{
-                printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
-                exit(EXIT_FAILURE);
-            }
+			if(tkn.tokenType == "semicolonToken"){
+				tkn = scan.driverFA(fp);
+				return newNode;
+			}
+			else{
+				printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
+				exit(EXIT_FAILURE);
+			}
 
-        }
+		}
 		else{
-        	printf("[PARSER ERROR]: Error on line %d: Expected \"in, out, iffy, loop, label, goto or Identifier\"\n", tkn.line);
-            exit(EXIT_FAILURE);
+			printf("[PARSER ERROR]: Error on line %d: Expected \"in, out, iffy, loop, label, goto or Identifier\"\n", tkn.line);
+			exit(EXIT_FAILURE);
 		}
 	}
 	else if(tkn.tokenType == "idToken"){
@@ -374,8 +353,8 @@ Node *stat(){
 			return newNode;
 		}
 		else{
-        	printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
-            exit(EXIT_FAILURE);
+			printf("[PARSER ERROR]: Error on line %d: Expected \";\"\n", tkn.line);
+			exit(EXIT_FAILURE);
 		}
 	}
 	else{
@@ -390,17 +369,17 @@ Node *stat(){
 Node *in(){
 	cout<<"Entered in()\n";
 	Node *newNode = createNode("<in>");
-	
+
 	if(tkn.tokenType == "idToken"){
 		newNode->tkn.push_back(tkn);
 		tkn = scan.driverFA(fp);
 		return newNode;
 	}
 	else{
-        printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\"\n", tkn.line);
-        exit(EXIT_FAILURE);	
+		printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\"\n", tkn.line);
+		exit(EXIT_FAILURE);	
 	}
-    
+
 	exit(EXIT_FAILURE);
 }
 
@@ -435,17 +414,17 @@ Node *iffy(){
 				return newNode;
 			}
 			else{
-        		printf("[PARSER ERROR]: Error on line %d: Expected \"then\" token\n", tkn.line);
+				printf("[PARSER ERROR]: Error on line %d: Expected \"then\" token\n", tkn.line);
 				exit(EXIT_FAILURE);
 			}
 		}
 		else{
-        	printf("[PARSER ERROR]: Error on line %d: Expected \"]\" token\n", tkn.line);
+			printf("[PARSER ERROR]: Error on line %d: Expected \"]\" token\n", tkn.line);
 			exit(EXIT_FAILURE);
 		}
 	}
 	else{
-        printf("[PARSER ERROR]: Error on line %d: Expected \"[\" token\n", tkn.line);
+		printf("[PARSER ERROR]: Error on line %d: Expected \"[\" token\n", tkn.line);
 		exit(EXIT_FAILURE);
 	}
 
@@ -471,12 +450,12 @@ Node *loop(){
 			return newNode;
 		}
 		else{
-        	printf("[PARSER ERROR]: Error on line %d: Expected \"]\" token\n", tkn.line);
+			printf("[PARSER ERROR]: Error on line %d: Expected \"]\" token\n", tkn.line);
 			exit(EXIT_FAILURE);
 		}
 	}
 	else{
-        printf("[PARSER ERROR]: Error on line %d: Expected \"[\" token\n", tkn.line);
+		printf("[PARSER ERROR]: Error on line %d: Expected \"[\" token\n", tkn.line);
 		exit(EXIT_FAILURE);
 	}
 
@@ -495,7 +474,7 @@ Node *assign(){
 		return newNode;
 	}
 	else{
-       	printf("[PARSER ERROR]: Error on line %d: Expected \":=\" token\n", tkn.line);
+		printf("[PARSER ERROR]: Error on line %d: Expected \":=\" token\n", tkn.line);
 		exit(EXIT_FAILURE);
 	}
 	exit(EXIT_FAILURE);
@@ -512,7 +491,7 @@ Node *label(){
 		return newNode;
 	}
 	else{
-        printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\" token\n", tkn.line);
+		printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\" token\n", tkn.line);
 		exit(EXIT_FAILURE);
 	}
 
@@ -530,7 +509,7 @@ Node *goTo(){
 		return newNode;
 	}
 	else{
-        printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\" token\n", tkn.line);
+		printf("[PARSER ERROR]: Error on line %d: Expected \"Identifier\" token\n", tkn.line);
 		exit(EXIT_FAILURE);
 	}
 
@@ -540,73 +519,49 @@ Node *goTo(){
 // <RO> -> < | << (two tokens) | > | >> (two tokens) | == (one token ==) | <> (two tokens) 
 Node *RO(){
 	cout<<"Entered RO();";
-	//Create the node <RO>
 	Node *newNode = createNode("<RO>");
 
-	//Check if token is [opTk]
-//	if(tk.id == opTk) {
-		/* CHECK: < | < < | < > */
-		//Check if token is [lessThanTk]
+	if(tkn.tokenType == "lessThanToken") {
+		newNode->tkn.push_back(tkn);
+		tkn = scan.driverFA(fp);		
+
 		if(tkn.tokenType == "lessThanToken") {
 			newNode->tkn.push_back(tkn);
-			tkn = scan.driverFA(fp);		
-
-			if(tkn.tokenType == "lessThanToken") {
-				newNode->tkn.push_back(tkn);
-				tkn = scan.driverFA(fp);
-				return newNode;
-			}
-			else if(tkn.tokenType == "greaterThanToken") {
-				newNode->tkn.push_back(tkn);
-				tkn = scan.driverFA(fp);
-				return newNode;
-			}
-		//	else if(tkn.tokenType != "lessThanToken" || tkn.tokenType != "greaterThanToken" || tkn.tokenType != "intToken") {
-        //		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
-		//		exit(EXIT_FAILURE);
-		//	} 
-			else {
-				return newNode;
-			}
-		}
-		/* CHECK: > | > > */
-		//Check if token is [greaterThanTk]
-		else if(tkn.tokenType == "greaterThanToken") {
-			newNode->tkn.push_back(tkn);
-			tkn = scan.driverFA(fp);		
-
-			if(tkn.tokenType == "greaterThanToken") {
-				newNode->tkn.push_back(tkn);
-				tkn = scan.driverFA(fp);
-				return newNode;
-			}
-		//	else if(tkn.tokenType != "greaterThanToken") {
-        //		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
-		//		exit(EXIT_FAILURE);
-		//	}
-			else {
-				return newNode;
-			}
-		}
-		/* CHECK: == */
-		//Check if token is [equalEqualTk]
-		else if(tkn.tokenType == "eqEqToken") {
-			newNode->tkn.push_back(tkn);
-			tkn = scan.driverFA(fp);;	
+			tkn = scan.driverFA(fp);
 			return newNode;
 		}
-		//Anything that is not valid... 
-		else {
-        	printf("[PARSER ERROR]: Error on line %d: Expected \"<, <<, >, >>, ==, <>\" token\n", tkn.line);
-			exit(EXIT_FAILURE);
+		else if(tkn.tokenType == "greaterThanToken") {
+			newNode->tkn.push_back(tkn);
+			tkn = scan.driverFA(fp);
+			return newNode;
 		}
-//	} 
-//	else {
-//        printf("[PARSER ERROR]: Error on line %d: Expected \"<, <<, >, >>, ==, <>\" token\n", tkn.line);
-//		exit(EXIT_FAILURE);
-//	}
-	
-	//An error has occur if code reach here
+		else {
+			return newNode;
+		}
+	}
+	else if(tkn.tokenType == "greaterThanToken") {
+		newNode->tkn.push_back(tkn);
+		tkn = scan.driverFA(fp);		
+
+		if(tkn.tokenType == "greaterThanToken") {
+			newNode->tkn.push_back(tkn);
+			tkn = scan.driverFA(fp);
+			return newNode;
+		}
+		else {
+			return newNode;
+		}
+	}
+	else if(tkn.tokenType == "eqEqToken") {
+		newNode->tkn.push_back(tkn);
+		tkn = scan.driverFA(fp);;	
+		return newNode;
+	}
+	else {
+		printf("[PARSER ERROR]: Error on line %d: Expected \"<, <<, >, >>, ==, <>\" token\n", tkn.line);
+		exit(EXIT_FAILURE);
+	}
+
 	exit(EXIT_FAILURE);
 }
 
@@ -618,6 +573,6 @@ Node *createNode(string name) {
 	newNode->child_4 = NULL;
 	newNode->child_5 = NULL;
 	newNode->label = name;
-	
+
 	return newNode;
 }

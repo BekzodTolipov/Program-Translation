@@ -1,12 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-//#include "scanner.h"
 #include "node.h"
 #include <fstream>
 
 extern FILE* fp;
-extern int lineNum;
 extern Scanner scan;
 
 Node *parser(string filename);

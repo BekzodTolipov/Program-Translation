@@ -20,14 +20,6 @@ void Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
-	//	return driverFA();
-}
-// Extract letter from word
-char Scanner::getLetter(unsigned int pos){
-	if(pos >= wordToCheck.size()){
-		return '\0';
-	}
-	return wordToCheck[pos];
 }
 
 tokenInfo Scanner::getEmptyToken(){
@@ -57,20 +49,14 @@ string Scanner::printTokens(){
 tokenInfo Scanner::findTokenType(int state){
 	int check = state-1001;
 	string result = "";
-	//	cout<<"TOKEN WORD CURRENTLY: "<<temp.token<<"RRR\n\n"<<endl;
-	//	temp.token += '\0';
 	if(find(reservedWords.begin(), reservedWords.end(), temp.token) != reservedWords.end()){
-		//	addToStruct(22);// resWord	
-		//		cout<<"\n\nFOUND RESERVED WORD\n\n";
 		temp.tokenType = tokenType[22];
 		result = printTokens();
 		tokens.push_back(temp);
 		return temp;
 	}
 	else{
-		//addToStruct(check);
 		temp.tokenType = tokenType[check];
-		//		cout<<"\n\nFOUND IDENTIFIER WORD\n\n";
 		result = printTokens();
 		tokens.push_back(temp);
 		return temp;
@@ -81,7 +67,7 @@ string Scanner::findError(int state){
 	int val = (state * -1) - 1;
 	vector<string> errors = {"Unknown symbol was found", "Unknown symbol was found in identifier", "can NOT be used by itself (valid symbols{:= or ==})"};
 	ostringstream msg_oss;
-	msg_oss << "SCANNER ERROR: '" << wordToCheck << "' " << errors[val] << " on line: " << lineCount << ", " << wordCount;
+	msg_oss << "[SCANNER ERROR]: '" << wordToCheck << "' " << errors[val] << " on line: " << lineCount << ", " << wordCount;
 	string msg = msg_oss.str();
 	cout<<msg<<endl;
 	return msg;
@@ -89,11 +75,6 @@ string Scanner::findError(int state){
 
 // Diver to check if given word is acceptable
 tokenInfo Scanner::driverFA(FILE *fp){
-	//	if(wordToCheck == "EOF"){
-	//		acceptingToken = "EOF";
-	//		findTokenType(1022);
-	//		return temp;
-	//	}
 	int state = 1;
 	int nextState;
 	char nextChar;
@@ -102,28 +83,16 @@ tokenInfo Scanner::driverFA(FILE *fp){
 	string potenToken = "";
 	string WHITESPACE = "\n\r\t\f\v";
 
-		cout<<"driverFA: potenToken: "<<potenToken<<endl;
-
 	while(state < FINAL){
 		nextChar = fgetc(fp);
 		if(nextChar == -1){
 			if(potenToken == ""){
-				//ungetc(nextChar, fp);
 				temp.tokenType = "EOFToken";
 				temp.line = line;
 				temp.token = "EOF";
 				return temp;
 			}
-			//else{
-			//	ungetc(nextChar, fp);
-				
-			//}
 		}
-		cout<<"Next char: "<<nextChar<<endl;
-	//	if(nextChar == '\n' && potenToken == ""){
-	//		line++;
-	//		continue;
-	//	}
 
 		if(nextChar == '#'){
 			cout<<"[SCANNER]: Found comments!\n";
@@ -140,16 +109,11 @@ tokenInfo Scanner::driverFA(FILE *fp){
 				temp.token = "EOF";
 				return temp;
 			}
-			//else if(nextChar == '#'){
-			//	continue;
-			//}
-			cout<<"[SCANNER]: Comments finished! with nextChar: "<<nextChar<<"\n\n";
+			//cout<<"[SCANNER]: Comments finished! with nextChar: "<<nextChar<<"\n\n";
 			continue;
 		}
 
 		nextState = fsaTable[state][nextChar];
-		cout<<"Next state: "<<nextState<<endl;
-		//cin>>position;
 		if(nextState >= 1000 || nextState == -99){
 			if(nextChar == '\n'){
 				line++;
@@ -170,56 +134,28 @@ tokenInfo Scanner::driverFA(FILE *fp){
 			}
 			// If SUCCSESS
 			if(nextState >= FINAL){
-			//	if(potenToken == ""){
-			//		ungetc(nextChar, fp);
-			//		return getEmptyToken();
-			//	}
-				cout<<"SCANNER: TOKEN: "<<potenToken<<endl;
-			//	size_t start = potenToken.find_first_not_of(WHITESPACE);	// Trim left
-		//		size_t end = potenToken.find_last_not_of(WHITESPACE);	// Trim right
-		//		potenToken = potenToken.substr(start, end+1);
-
 				string trimmed = "";
-				for(int i=0; i < potenToken.length(); i++){
+				for(unsigned int i=0; i < potenToken.length(); i++){
 					if(!isspace(potenToken[i])){
 						trimmed += potenToken[i];
 					}
 				}
-				//cout<<"SCANNER: TOKEN: "<<trimmed<<endl;
 
 				acceptingToken = temp.token = trimmed;
-				//potenToken += '\n';
-				//setNewWord(potenToken, line, 0);
 				findTokenType(nextState);
-				//acceptingToken = temp.token = potenToken;
 				temp.line = line;
 				temp.charToWord = 0;
-			//	ungetc(nextChar, fp);
 				return temp;
-				//}	
+			}
 		}
-		// If still checking
-		//	else{
-		//cout<<FINAL<<endl;	
-		//		state = nextState;
-		//		potenToken += nextChar;
-		//	}
-	}
-	else{
-		cout<<"Check next char and add to potenToken: "<<nextChar<<endl;
-		if(!isspace(nextChar)){
-			potenToken += nextChar;
+		else{
+			if(!isspace(nextChar)){
+				potenToken += nextChar;
+			}
+			state = nextState;
 		}
-		state = nextState;
 	}
-}
-
-//temp.tokenType = "EOFToken";
-//temp.line = line;
-//temp.token = "EOF";
-return temp;
-//cout<<potenToken<<endl;
-//return null;
+	return temp;
 }
 
 void Scanner::setupFSAtable() {

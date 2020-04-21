@@ -7,9 +7,9 @@
 using namespace std;
 
 struct Node {
-    string label;
-    Node *child_1, *child_2, *child_3, *child_4, *child_5;
-    vector<tokenInfo> tkn;
+	string label;
+	Node *child_1, *child_2, *child_3, *child_4, *child_5;
+	vector<tokenInfo> tkn;
 	int level;
 };
 

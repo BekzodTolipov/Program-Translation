@@ -23,35 +23,22 @@ bool is_file_given = false;
 const int MAXCHAR = 1024;
 
 int main(int argc, char*argv[]){ 
-//	vector<string> temp;
-	int level = 0;
-	cout<<"\nWelcome to simple Scanner to tokenize the given file\n";
+	cout<<"\nWelcome to simple program to demonstrate on how scanner and parser works together.\n";
 
 	if(validate_cmd_line(argc, argv) == -1){	// Check commend line for arguments
 	//	temp = read_user_input();
 	}
 	else{
 		my_get_opt(argc, argv);
-		if(is_file_given){
-			//fp = popen(file_name.c_str(), "r");
-			//temp = read_file(file_name);	// Read the file
-		}
-		else{
+		if(!is_file_given){
 			int size = strlen(argv[1]);
 			file_name = convert_to_string(argv[1], size);	// If file is given without option than convert it
 			file_name.append(".sp2020");
-			//cout<<"PRINTING: filename: "<<file_name<<endl;
-			//fp = popen(file_name.c_str(), "r");
-			//cout<<"PRINTING: filename: "<<file_name<<endl;
-			//temp = read_file(file_name);
 		}
 	}
 
 	Node *parseTree = parser(file_name);
 	printTree(parseTree, 0);
-
-	pclose(fp);
-
 	cout<<endl;
 
 	return 0;
