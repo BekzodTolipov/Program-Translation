@@ -77,7 +77,7 @@ class Scanner {
 	Scanner();
 	tokenInfo scanner(FILE *fp);
 	void printTheWord();
-	tokenInfo setNewWord(string newWord, int lineCount, int wordCount);
+	void setNewWord(string newWord, int lineCount, int wordCount);
 	void setupFSAtable();
 	tokenInfo driverFA(FILE *fp);
 	char getLetter(unsigned int);

@@ -580,10 +580,10 @@ Node *RO(){
 				tkn = scan.driverFA(fp);
 				return newNode;
 			}
-			else if(tkn.tokenType != "greaterThanToken") {
-        		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
-				exit(EXIT_FAILURE);
-			}
+		//	else if(tkn.tokenType != "greaterThanToken") {
+        //		printf("[PARSER ERROR]: Error on line %d: Expected \"< or << or <>\" token\n", tkn.line);
+		//		exit(EXIT_FAILURE);
+		//	}
 			else {
 				return newNode;
 			}

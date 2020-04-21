@@ -16,7 +16,7 @@ void Scanner::printTheWord() {
 }
 // Start the scanner by adding the values into its struct and run 
 // driverFA() and return its result
-tokenInfo Scanner::setNewWord(string newWord, int line, int word) {
+void Scanner::setNewWord(string newWord, int line, int word) {
 	wordToCheck = newWord;
 	lineCount = line;
 	wordCount = word;
@@ -127,15 +127,23 @@ tokenInfo Scanner::driverFA(FILE *fp){
 
 		if(nextChar == '#'){
 			cout<<"[SCANNER]: Found comments!\n";
+			nextChar = fgetc(fp);
 			while(nextChar != '#' && nextChar != EOF){
 				//cout<<nextChar<<endl;
 				if(nextChar == '\n')
 					line++;
 				nextChar = fgetc(fp);
 			}
-			//if(nextChar == EOF){
+			if(nextChar == EOF){
+				temp.tokenType = "EOFToken";
+				temp.line = line;
+				temp.token = "EOF";
+				return temp;
+			}
+			//else if(nextChar == '#'){
+			//	continue;
 			//}
-			cout<<"[SCANNER]: Comments finished!\n";
+			cout<<"[SCANNER]: Comments finished! with nextChar: "<<nextChar<<"\n\n";
 			continue;
 		}
 
