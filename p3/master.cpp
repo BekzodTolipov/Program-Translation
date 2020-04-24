@@ -13,7 +13,7 @@ using namespace std;
 
 // Prototypes
 string convert_to_string(char* a, int size);
-void my_get_opt(int argc, char*argv[]);
+void my_get_opt(int argc, char* argv[]);
 int validate_cmd_line(int argc, char* argv[]);
 vector<string> read_user_input();
 void is_file_empty(vector<string> file_content);
@@ -24,7 +24,7 @@ bool is_file_given = false;
 const int MAXCHAR = 1024;
 
 int main(int argc, char*argv[]){ 
-	cout<<"\nWelcome to simple program to demonstrate on how scanner and parser works together.\n";
+	cout<<"\nWelcome to simple program to demonstrate on how scanner and parser works together and check static semantics.\n";
 
 	if(validate_cmd_line(argc, argv) == -1){	// Check commend line for arguments
 	//	temp = read_user_input();
@@ -39,7 +39,7 @@ int main(int argc, char*argv[]){
 	}
 
 	Node *parseTree = parser(file_name);
-	printTree(parseTree, 0);
+	//printTree(parseTree, 0);
 
 	cout<<"\n\n{MASTER}: Entering semantic validation section!\n\n";
 	validateSemantic(parseTree);
@@ -92,7 +92,8 @@ void my_get_opt(int argc, char* argv[]){
 		switch (c)
 		{
 			case 'h':
-				printf("To run the program you have following options:\n\n[ -h for help]\nTo execute the file follow the code:\n./%s [ -h | -f ]", argv[0]);
+				cout<<"To run the program you have following options:\n\n[ -h for help]\nTo execute the file follow the code:\n"<<argv[0]<<" [ -h | -f ]\n\n";
+				exit(0);
 				break;
 			case 'f':
 				strncpy(dummy, optarg, 255);

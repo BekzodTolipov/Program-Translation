@@ -7,5 +7,8 @@
 #include <string>
 
 void validateSemantic(Node *p);
+void errorMessage(tokenInfo token, int option);
+void checkIfDeclared(tokenInfo tkn, bool isFound, string errCode);
+bool checkIfInPool(tokenInfo fromNode, vector<tokenInfo> pool);
 
 #endif

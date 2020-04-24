@@ -1,6 +1,6 @@
 #include <iostream>
 #include <algorithm>
-#include <map>
+//#include <map>
 #include "semanticValidator.h"
 
 tokenInfo foundToken;
@@ -15,6 +15,7 @@ map<string, int> error_map = {
 	{"GOTO_ERR_CODE", 6}
 };
 
+// Generate ERRORS
 void errorMessage(tokenInfo token, int option){
 	switch(option){
 		case 1: cout<<"[SEMANTIC-ERROR]: Error caught during <declare> statement:\n-->Variable already has been declared "<<token.token<<" in line "<<token.line+1<<endl;
@@ -35,6 +36,7 @@ void errorMessage(tokenInfo token, int option){
 	exit(EXIT_FAILURE);
 }
 
+// Check if variable used in <out>, <iffy>, <assing>, <in>, <goto>, <loop>, <label> is declared
 void checkIfDeclared(tokenInfo tkn, bool isFound, string errCode){
 	if(tkn.tokenType == "idToken"){
 		if(!isFound){
@@ -44,6 +46,7 @@ void checkIfDeclared(tokenInfo tkn, bool isFound, string errCode){
 	}
 }
 
+// Check if identifier in a node exists in declared variable pool
 bool checkIfInPool(tokenInfo fromNode, vector<tokenInfo> pool){
 	for(unsigned int j = 0; j < pool.size(); j++){
 		if(fromNode.tokenType == "idToken" && pool[j].token == fromNode.token){
@@ -54,6 +57,7 @@ bool checkIfInPool(tokenInfo fromNode, vector<tokenInfo> pool){
 	return false;
 }
 
+// Driver
 void validateSemantic(Node *p){
 	static vector<tokenInfo> stt = {};
 	if(p == NULL){
@@ -118,8 +122,6 @@ void validateSemantic(Node *p){
 	else if(p->label == "<loop>"){
 		originTag = "<loop>";
 	}
-
-
 
 	validateSemantic(p->child_1);
 	validateSemantic(p->child_2);
