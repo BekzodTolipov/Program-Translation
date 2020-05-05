@@ -1,0 +1,38 @@
+#test comment to make sure you still consider these
+and let's make it a multiline comment at that#
+#Let's see if you handle multiple declare statements#
+declare ut := 99 ;
+declare get := 12 ;
+#Now we go into the outermost block#
+{
+#Blocks start with a vars, so let's throw one in#
+declare uo := 2 ;
+#Now let's add an inner block, but as simple as possible, just 1 statement#
+{ in ident49to7 ; }
+#Let's get basic statements out of the way#
+label tel34 ;
+goto update23 ;
+iden4 := 31 ;
+#Let's do some trickier statements inside another block#
+{
+#But make the first one as simple as possible#
+out 32 ;
+iffy [ 2 == ter ] 
+  then in tel ; ;
+loop [ bv <> 1 ] tel13 := ( 14 ) ; ;
+#And another new block#
+{
+#An out statement allows easy expression use without extra parts#
+#that have already been tested.#
+out 24 - 23 - 22 ;
+out * 25 / 19 - tede + ret ;
+#The M production allows unlimited * marks#
+out * 45 + ( 34 * * * * * 23 * * ( 32 ) ) ;
+iffy [ * * 60 - * ter64 - tet > 43 + ( e4 / er4 ) ]
+#We'll add another new block in the middle of the iffy statement#
+  then { loop [ ( 22 ) + det / 23 < fed ] 
+#Now we add another new block, while using the vars inside#
+    { declare d53 := 12 ; goto er4 ; } ; } ;
+}
+}
+}
