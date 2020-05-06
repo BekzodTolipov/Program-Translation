@@ -5,7 +5,7 @@ CHILD_CFILE =
 MASTER_OBJ=$(MASTER_CFILE:.cpp=.o)
 CHILD_OBJ=$(CHILD_CFILE:.cpp=.o)
 
-MASTER_EXE = statSem
+MASTER_EXE = comp
 CHILD_EXE = 
 
 CFLAGS = -g -Wall
