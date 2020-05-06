@@ -24,7 +24,8 @@ string file_name;
 bool is_file_given = false;
 const int MAXCHAR = 1024;
 
-int main(int argc, char*argv[]){ 
+int main(int argc, char*argv[]){
+	string given_file = ""; 
 	cout<<"\nWelcome to simple program to demonstrate on how scanner and parser works together and check static semantics.\n";
 
 	if(validate_cmd_line(argc, argv) == -1){	// Check commend line for arguments
@@ -35,6 +36,7 @@ int main(int argc, char*argv[]){
 		if(!is_file_given){
 			int size = strlen(argv[1]);
 			file_name = convert_to_string(argv[1], size);	// If file is given without option than convert it
+			given_file = file_name;
 			file_name.append(".sp2020");
 		}
 	}
@@ -46,7 +48,7 @@ int main(int argc, char*argv[]){
 	vector<tokenInfo> st = validateSemantic(parseTree);
 	cout<<"{MASTER}: Passed Static Semantic Test!\n";
 	cout<<"\n{MASTER}: Envoking code generator...\n";
-	startGenerator(parseTree, st, file_name);
+	startGenerator(parseTree, st, given_file);
 	cout<<"{MASTER}: Finished code generating!\n";
 	cout<<endl;
 

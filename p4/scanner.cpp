@@ -104,10 +104,7 @@ tokenInfo Scanner::driverFA(FILE *fp){
 			nextChar = ' ';
 		}
 			
-		cout<<"Outeside while next char: "<<nextChar<<"\n\n";
-
 		if(nextChar == '#'){
-			cout<<"[SCANNER]: Found comments!\n";
 			nextChar = fgetc(fp);
 			while(nextChar != '#' && nextChar != EOF){
 				//cout<<nextChar<<endl;

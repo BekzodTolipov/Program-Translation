@@ -8,11 +8,18 @@ string LAB_TYPE = "LABEL";
 
 void startGenerator(Node *p, vector<tokenInfo> st, string fileName){
 	local_st = st;
-	//ofp = fopen(fileName.c_str(), "w");
+	ofp = fopen((fileName+".asm").c_str(), "w");
 
 	program(p);
 
+	printToTarget("", "STOP");
 	//Need to travers local_st and declare vars in assembly
+	for(int i=0; i<(int)local_st.size(); i++){
+		printToTarget(" 0", local_st[i].token);
+	}
+	for(int j=0; j<(int)temp_vars.size(); j++){
+		printToTarget(" 0", temp_vars[j]);
+	}
 	return;
 }
 
@@ -70,9 +77,9 @@ void stat(Node *p){
 	in(p->child_1);
 	out(p->child_1);
 	iffy(p->child_1);
-	//loop(p->child_1);
-	//label(p->child_1);
-	//goTo(p->child_1);
+	loop(p->child_1);
+	label(p->child_1);
+	goTo(p->child_1);
 }
 
 void in(Node *p){
@@ -98,6 +105,11 @@ void expr(Node *p){
 		return;
 
 	//cout<<"expr() "<<"\n";
+	if(p->tkn.size() == 0){
+		N(p->child_1);
+		return;
+	}
+	else{
 	N(p->child_1);
 	if(p->child_2 != NULL){
 		int pos = createNewTemp(VAR_TYPE);
@@ -105,32 +117,35 @@ void expr(Node *p){
 		expr(p->child_2);
 		printToTarget(temp_vars[pos], "SUB");
 	}
+	}
 }
 
 void N(Node *p){
 	if(p == NULL)
 		return;
 
-	//cout<<"N()\n";
+	//cout<<"N() "<<p->label<<"\n";
 
 	if(p->tkn.size() == 0){
 		A(p->child_2);
 		return;
 	}
+	else{
 	N(p->child_2);
 	if(p->child_1 != NULL){
-		if(p->child_2->tkn[0].tokenType == "divideToken"){
+		if(p->child_1->tkn[0].tokenType == "divideToken"){
 			int pos = createNewTemp(VAR_TYPE);
 			printToTarget(temp_vars[pos], "STORE");
 			A(p->child_1);
 			printToTarget(temp_vars[pos], "DIV");
 		}
-		else if(p->tkn[0].tokenType == "multiplyToken"){
+		else if(p->child_1->tkn[0].tokenType == "multiplyToken"){
 			int pos = createNewTemp(VAR_TYPE);
 			printToTarget(temp_vars[pos], "STORE");
 			A(p->child_1);
 			printToTarget(temp_vars[pos], "MULT");
 		}
+	}
 	}
 }
 
@@ -142,13 +157,16 @@ void A(Node *p){
 
 	if(p->tkn.size() == 0){
 		M(p->child_1);
+		return;
 	}
+	else{
 	A(p->child_2);
 	if(p->child_1 != NULL){
 		int pos = createNewTemp(VAR_TYPE);
 		printToTarget(temp_vars[pos], "STORE");
 		M(p->child_1);
 		printToTarget(temp_vars[pos], "ADD");
+	}
 	}
 }
 
@@ -212,8 +230,9 @@ void iffy(Node *p){
 	else{
 		printToTarget(temp_labs[l_pos], "BRNEG");
 	}
+
 	stat(p->child_4);
-	printToTarget(": NOOP", temp_labs[l_pos]);
+	printToTarget("", temp_labs[l_pos] + ": NOOP");
 	return;
 }
 
@@ -221,19 +240,39 @@ void loop(Node *p){
 	if(p == NULL || p->label != "<loop>")
 		return;
 
+	//cout<<"loop()\n";
+	int l_pos_loop = createNewTemp("LABEL");
+	printToTarget("", temp_labs[l_pos_loop] + ": NOOP");
 	expr(p->child_1);
 	int v_pos = createNewTemp("VAR");
 	printToTarget(temp_vars[v_pos], "STORE");
 	expr(p->child_3);
 	printToTarget(temp_vars[v_pos], "SUB");
 	int l_pos = createNewTemp("LABEL");
-
 	if(p->child_2->tkn[0].tokenType == "eqEqToken"){
 		printToTarget(temp_labs[l_pos], "BRNEG");
 		printToTarget(temp_labs[l_pos], "BRPOS");
 	}
+	else if(p->child_2->tkn[0].token == "lessThanToken"){
+		if(p->child_2->tkn.size() == 2){
+			if(p->child_2->tkn[1].token == "greaterThanToken"){
+				printToTarget(temp_labs[l_pos], "BRZERO");
+			}
+			else{
+				printToTarget(temp_labs[l_pos], "BRPOS");
+			}
+		}
+		else{
+			printToTarget(temp_labs[l_pos], "BRPOS");
+		}
+	}
+	else{
+		printToTarget(temp_labs[l_pos], "BRNEG");
+	}
+
 	stat(p->child_4);
-	printToTarget(": NOOP", temp_labs[l_pos]);
+	printToTarget(temp_labs[l_pos_loop], "BR");
+	printToTarget("", temp_labs[l_pos]+": NOOP");
 }
 
 void assign(Node *p){
@@ -246,7 +285,7 @@ void assign(Node *p){
 void label(Node *p){
 	if(p == NULL || p->label != "<label>")
 		return;
-
+	printToTarget("", p->tkn[0].token + ": NOOP");
 	// Dont know yet
 }
 
@@ -263,12 +302,12 @@ int createNewTemp(string what){
 
 
 	if(what == "VAR"){ //create new temp var
-		tempName = "VAR_" + to_string(++var_cnt);
+		tempName = "VAR" + to_string(++var_cnt);
 		temp_vars.push_back(tempName);
 		return (temp_vars.size()-1);
 	}
 	else if(what == "LABEL"){ // create new temp label
-		tempName = "LABEL_" + to_string(++lab_cnt);
+		tempName = "LABEL" + to_string(++lab_cnt);
 		temp_labs.push_back(tempName);
 		return (temp_labs.size()-1);
 	}
@@ -279,5 +318,7 @@ int createNewTemp(string what){
 }
 
 void printToTarget(string tkn, string command){
-	cout<<command<<" "<<tkn<<endl;
+	string data = command+" "+tkn+"\n";
+	cout<<data;
+	fputs(data.c_str(), ofp);
 }
