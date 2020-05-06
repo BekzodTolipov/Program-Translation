@@ -111,6 +111,15 @@ tokenInfo Scanner::driverFA(FILE *fp){
 				if(nextChar == '\n')
 					line++;
 				nextChar = fgetc(fp);
+				spaceFound = false;
+				while(nextChar == ' '){
+					nextChar = fgetc(fp);
+					spaceFound = true;
+				}
+				if(spaceFound){
+					ungetc(nextChar, fp);
+					nextChar = ' ';
+				}
 			}
 			if(nextChar == EOF){
 				temp.tokenType = "EOFToken";
