@@ -94,6 +94,18 @@ tokenInfo Scanner::driverFA(FILE *fp){
 			}
 		}
 
+		bool spaceFound = false;
+		while(nextChar == ' '){
+			nextChar = fgetc(fp);
+			spaceFound = true;
+		}
+		if(spaceFound){
+			ungetc(nextChar, fp);
+			nextChar = ' ';
+		}
+			
+		cout<<"Outeside while next char: "<<nextChar<<"\n\n";
+
 		if(nextChar == '#'){
 			cout<<"[SCANNER]: Found comments!\n";
 			nextChar = fgetc(fp);
