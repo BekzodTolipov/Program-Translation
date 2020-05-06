@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-void validateSemantic(Node *p);
+vector<tokenInfo> validateSemantic(Node *p);
 void errorMessage(tokenInfo token, int option);
 void checkIfDeclared(tokenInfo tkn, bool isFound, string errCode);
 bool checkIfInPool(tokenInfo fromNode, vector<tokenInfo> pool);

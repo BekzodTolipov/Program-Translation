@@ -40,11 +40,12 @@ int main(int argc, char*argv[]){
 	}
 
 	Node *parseTree = parser(file_name);
-	//printTree(parseTree, 0);
+	printTree(parseTree, 0);
 
 	cout<<"\n\n{MASTER}: Entering semantic validation section!\n\n";
-	validateSemantic(parseTree);
+	vector<tokenInfo> st = validateSemantic(parseTree);
 	cout<<"\n{MASTER}: Passed Static Semantic Test\n";
+	startGenerator(parseTree, st, file_name);
 	cout<<endl;
 
 	return 0;

@@ -1,4 +1,7 @@
-void startGenerator(Node *p, vector<tokenInfo> st){
+#include "codeGenerator.h"
+FILE *ofp = NULL;
+vector<tokenInfo> local_st;
+void startGenerator(Node *p, vector<tokenInfo> st, string fileName){
 	return;
 }
 

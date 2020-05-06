@@ -58,10 +58,10 @@ bool checkIfInPool(tokenInfo fromNode, vector<tokenInfo> pool){
 }
 
 // Driver
-void validateSemantic(Node *p){
+vector<tokenInfo> validateSemantic(Node *p){
 	static vector<tokenInfo> stt = {};
 	if(p == NULL){
-		return;
+		return stt;
 	}
 
 	if(p->label == "<vars>"){
@@ -127,4 +127,6 @@ void validateSemantic(Node *p){
 	validateSemantic(p->child_2);
 	validateSemantic(p->child_3);
 	validateSemantic(p->child_4);
+
+	return stt;
 }
